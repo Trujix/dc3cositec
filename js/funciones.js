@@ -7,10 +7,6 @@ $(function(){
 	leerCatalogos();
 });
 
-$(document).on('click', '#altaCursos', function(){
-	$('#modalCapt').modal('show');
-});
-
 var accionPDF = 0;
 $("#visualizarPDF").on("click", function(){
 	accionPDF = parseInt($(this).val());
@@ -18,17 +14,164 @@ $("#visualizarPDF").on("click", function(){
 });
 
 $("#descargarPDF").on("click", function(){
-	curpTXT = "ABCD890101HCMRMN01";
-	curpTXT = curpTXT.split('');
-	if(curpTXT.length < 18)
-		curpTXT.push('');
-
 	accionPDF = parseInt($(this).val());
-	llenarValsPDF();
-
-	crearDocumento();
+	valsFormulario();
 });
 
+// ABRIR MODAL (CURSOS)
+$(document).on('click', '#altaCursos', function(){
+	$('#modalCapt').modal('show');
+	$('#titModal').text('Alta de Cursos');
+});
+// ABRIR MODAL (EMPRESAS)
+$(document).on('click', '#altaEmpresas', function(){
+	$('#modalCapt').modal('show');
+	$('#titModal').text('Alta de Empresas');
+	accionEmpresa = 'altaEmpresa';
+	idEmpresa = '';
+	limpiarModalEmpresas();
+});
+
+// CERRAR MODAL
+$(document).on('click', "button[name='cerrModal']", function(){
+	$('#modalCapt').modal('hide');
+});
+
+// ABRIR PANEL DE CONSULTA
+$(document).on('click', '#consulEmpresa', function(){
+	if($(this).val() === "0"){
+		$(this).val("1");
+		$('#consultaEmpresa').show(200);
+	}else if($(this).val() === "1"){
+		$(this).val("0");
+		$('#consultaEmpresa').hide(200);
+	}
+});
+
+
+// ::::::::: ******** FUNCIONES CON EMPRESAS ******* :::
+// ALTA DE EMPRESA
+var accionEmpresa;
+var idEmpresa;
+$(document).on('click', '#altaEmpresa', function(){
+	var jsonEmpresa = {
+		id: idEmpresa,
+		nombre: $('#empresa').val(),
+		rfc: $('#rfc').val(),
+		patron: $('#patron').val(),
+		representante: $('#representante').val(),
+		img: fotoPDF
+	};
+	$.ajax({
+		url:'rutas/rutaEmpresas.php',
+		type:'POST',
+		data: {info: jsonEmpresa, action: accionEmpresa},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			//removeSpinner();
+			$('#modalCapt').modal('hide');
+			console.log('Exito');
+		}
+	});
+});
+
+// CONSULTA EMPRESA
+$(document).on('keyup', '#buscarEmpresa', function(){
+	var nombre = $(this).val();
+	$('#tablaEmpresa').html('');
+	if(nombre !== ''){
+		$.ajax({
+			url:'rutas/rutaEmpresas.php',
+			type:'POST',
+			data: {info: nombre, action: 'consultaEmpresa'},
+			dataType:'JSON',
+			error: function(error){
+				console.log(error);
+				//removeSpinner();
+			},
+			success: function(data){
+				//removeSpinner();
+				var tabla = "<table class='table'><thead><tr><th>Nombre</th><th>Opciones</th></tr></thead><tbody>";
+				$.each(data, function (i, campo){
+					tabla += "<tr><td>" + campo.nombre + "</td><td><button onclick='editarEmpresa("+campo.id+")'>EDITAR</button>&nbsp;&nbsp;<button onclick='borrarEmpresas("+campo.id+")'>BORRAR</button></td></tr>";
+				});
+				tabla += "</tbody></table>";
+				$('#tablaEmpresa').append(tabla);
+			}
+		});
+	}
+});
+// FUNCION EDITAR EMPRESAS
+function editarEmpresa(id){
+	idEmpresa = id;
+	accionEmpresa = 'editarEmpresa';
+
+	$.ajax({
+		url:'rutas/rutaEmpresas.php',
+		type:'POST',
+		data: {info: idEmpresa, action: 'traerEmpresa'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			//removeSpinner();
+			$('#empresa').val(data[0]["nombre"]);
+			$('#rfc').val(data[0]["rfc"]);
+			$('#patron').val(data[0]["jefe"]);
+			$('#representante').val(data[0]["representante"]);
+			$('#imgfile').val('');
+
+			var c = document.getElementById("canvas");
+			var ctx = c.getContext("2d");
+			ctx.clearRect(0, 0, c.width, c.height);
+			fotoPDF = 'sin-foto';
+		}
+	});
+}
+
+// FUNCION BAJA EMPRESA
+function borrarEmpresas(id){
+	$.ajax({
+		url:'rutas/rutaEmpresas.php',
+		type:'POST',
+		data: {info: id, action: 'bajaEmpresa'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			//removeSpinner();
+			limpiarModalEmpresas();
+			$('#consulEmpresa').click();
+			$('#buscarEmpresa').val('');
+			$('#tablaEmpresa').html('');
+		}
+	});
+}
+
+// FUNCION LIMPIAR CAMPOS MODAL (EMPRESAS)
+function limpiarModalEmpresas(){
+	$('#empresa').val('');
+	$('#rfc').val('');
+	$('#patron').val('');
+	$('#representante').val('');
+	$('#imgfile').val('');
+
+	var c = document.getElementById("canvas");
+	var ctx = c.getContext("2d");
+	ctx.clearRect(0, 0, c.width, c.height);
+	fotoPDF = 'sin-foto';
+}
+
+
+// FUNCIONES CON CATALOGOS
 function leerCatalogos(){
 	$.ajax({
 		url:'rutas/rutaCatalogos.php',

@@ -17,3 +17,12 @@ body {
 .theme-showcase .navbar .container {
   width: auto;
 }
+
+#canvas {
+	width: 50px;
+}
+
+.tablaConsulta {
+	max-height: 150px;
+	overflow: scroll;
+}

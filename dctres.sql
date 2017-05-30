@@ -22,6 +22,20 @@ PRIMARY KEY (`id`),
 	KEY `clave` (`clave`)
 );
 
+-- ::::::::::: TABLA DE CATALOGO NACIONAL DE EMPLEOS
+DROP TABLE IF EXISTS `empresas`;
+CREATE TABLE IF NOT EXISTS `empresas` (
+	`id` bigint(20) NOT NULL AUTO_INCREMENT,
+	`nombre` varchar(400) COLLATE utf8_bin DEFAULT NULL,
+	`rfc` varchar(300) COLLATE utf8_bin DEFAULT NULL,
+	`jefe` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`representante` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`imagen` varchar(65535) COLLATE utf8_bin DEFAULT NULL,
+	`status` varchar(20) COLLATE utf8_bin DEFAULT '1',
+PRIMARY KEY (`id`),
+	KEY `rfc` (`rfc`)
+);
+
 -- ::::::::::: INSERCION DE VALORES TABLAS EMPLEO Y CURSOS
 INSERT INTO empleo_catalogo (clave,denominacion) VALUES ('01','Cultivo, crianza y aprovechamiento');
 INSERT INTO empleo_catalogo (clave,denominacion) VALUES ('01.1','Agricultura y silvicultura');
