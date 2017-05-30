@@ -24,6 +24,24 @@
 			return $this->query($bajasEmpresa);
 		}
 
+		public function editarEmpresa($info){
+			$id = $info["id"];
+			$nombre = $info["nombre"];
+			$rfc = $info["rfc"];
+			$patron = $info["patron"];
+			$representante = $info["representante"];
+			$img = $info["img"];
+
+			$editEmpresa = "CALL SP_EDITAREMPRESA(
+					'$id', '$nombre' ,'$rfc' ,'$patron' ,'$representante' ,'$img'
+				)";
+			if($this->query($editEmpresa)){
+				return "TRUE";
+			}else{
+				return $editEmpresa;
+			}
+		}
+
 		public function consultaEmpresa($info){
 			$buscarEmpresa = "CALL SP_BUSCAREMPRESA('$info')";
 			return $this->query_assoc($buscarEmpresa);

@@ -9,6 +9,10 @@
 	<!-- BOOSTTRAP - PDF LIBRARY -->
 	<script src='extras/pdfmake/build/pdfmake.min.js'></script>
   	<script src='extras/pdfmake/build/vfs_fonts.js'></script>
+  	<link rel="stylesheet" href="extras/jqalert/css/jquery-confirm.css">
+	<script src="extras/jqalert/js/jquery-confirm.js"></script>
+	<script type="text/javascript" src="extras/pnotify/pnotify.custom.min.js"></script>
+	<link href="extras/pnotify/pnotify.custom.min.css" media="all" rel="stylesheet" type="text/css" />
   	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
   	<script src="bootstrap/js/bootstrap.min.js"></script>
 </head>
@@ -72,14 +76,42 @@
 			</div>
 		</div>
 
+		<div class="panel panel-warning">
+			<div class="panel-heading">SELECCIONE EMPRESA Y CURSO</div>
+			<div class="panel-body">
+
+				<div class="row">
+					<div class="col-md-6">
+						<div class="input-group">
+							<span class="input-group-btn">
+								<button id="buscarEmpleadoDoc" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
+							</span>
+							<input id="selectEmpresa" type="text" class="form-control" placeholder="Nombre de la empresa" readonly="true" />
+						</div>
+					</div>
+
+					<div class="col-md-6">
+						<select id="selectCurso" class="form-control">
+							<option value="-1">- Seleccione el curso -</option>
+						</select>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<div class="row">
 					<div class="col-md-4">
-						<button id="visualizarPDF" value="1" class="btn btn-default">Visualizar Documento</button>
+						<button id="visualizarPDF" value="1" class="btn btn-default">
+							<span class="glyphicon glyphicon-print"></span> Visualizar Documento
+						</button>
 					</div>
 					<div class="col-md-4">
-						<button id="descargarPDF" value="2" class="btn btn-default">Descargar Documento</button>
+						<button id="descargarPDF" value="2" class="btn btn-default">
+							<span class="glyphicon glyphicon-save"></span> Descargar Documento
+						</button>
 					</div>
 				</div>		
 			</div>
@@ -95,83 +127,22 @@
 	    		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	    		<h5 id="titModal" class="modal-title"></h5>
 	    	</div>
-	    	<div class="modal-body">
+	    	<div id="modalCuerpo" class="modal-body">
 	    	<!-- INICIO CONTENIDO -->
 
-	    		<div class="panel panel-info">
-					<div class="panel-heading">DATOS DE LA EMPRESA</div>
-					<div class="panel-body">
-
-						<div class="row">
-							<div class="col-md-12">
-								<input id="empresa" type="text" class="form-control" placeholder="Nombre o razón social (En caso de persona física, anotar apellido paterno, apellido materno y nombre(s))" />
-							</div>
-						</div><br>
-
-						<div class="row">
-							<div class="col-md-4">
-								<input id="rfc" type="text" class="form-control" Placeholder="RFC de la empresa" maxlength="13" />
-							</div>
-							<div class="col-md-4">
-								<input id="patron" type="text" class="form-control" Placeholder="Patrón o representante Legal" />
-							</div>
-							<div class="col-md-4">
-								<input id="representante" type="text" class="form-control" Placeholder="Representante de trabajadores" />
-							</div>
-						</div><br>
-
-						<div class="row">
-							<div class="col-md-6">
-								<input type="file" id="imgfile" /><br>
-							</div>
-							<div class="col-md-6">
-								<canvas id="canvas" class="img-thumbnail"></canvas>
-							</div>
-						</div>
-
-						<div class="row">
-							<div class="col-md-12">
-								<button id="consulEmpresa" value="0" class="btn btn-info"><span class="glyphicon glyphicon-search"></span></button>
-							</div>
-						</div><br>
-
-						<div id="consultaEmpresa" class="row" hidden>
-							<div class="col-md-12">
-								<div class="row">
-									<div class="col-md-9">
-										<input id="buscarEmpresa" type="text" class="form-control" placeholder="Esciba el nombre de la empresa...">
-									</div>
-									<div class="col-md-3"><p></p></div>
-								</div><br>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="tablaConsulta">
-											<div id="tablaEmpresa" class="table-responsive"></div>
-										</div>
-									</div>
-								</div>
-							</div>
-								
-						</div>
-
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col-md-3">
-						<p></p>
-					</div>
-					<div class="col-md-3">
-						<button id="altaEmpresa" class="btn btn-success">Guardar</button>
-					</div>
-					<div class="col-md-3">
-						<button name="cerrModal" class="btn btn-danger">Cancelar</button>
-					</div>
-					<div class="col-md-3">
-						<p></p>
-					</div>
-				</div>
-
+	    		<div class="row">
+	    			<div class="col-md-12">
+	    				<input id="buscarEmpresaDoc" type="text" class="form-control" placeholder="Escriba el nombre de la empresa" />
+	    			</div>
+	    		</div><br>
+	    		<div class="row">
+	    			<div class="col-md-12">
+	    				<br>
+	    				<div class="tablaConsulta2">
+	    					<div id="tablaEmpresasDoc" class="table-responsive"></div>
+	    				</div>
+	    			</div>
+	    		</div>
 
 			<!-- FIN CONTENIDO -->
 			</div>

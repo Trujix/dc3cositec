@@ -22,7 +22,16 @@ body {
 	width: 50px;
 }
 
+#canvas2 {
+  width: 50px;
+}
+
 .tablaConsulta {
 	max-height: 150px;
 	overflow: scroll;
+}
+
+.tablaConsulta2{
+  max-height: 250px;
+  overflow: scroll;
 }

@@ -2,10 +2,6 @@
 var trabajadorNuevo = true;
 var empresaNuevo = true;
 var cursoNuevo = true;
-$(function(){
-	// TRAER LOS CATALOGOS
-	leerCatalogos();
-});
 
 var accionPDF = 0;
 $("#visualizarPDF").on("click", function(){
@@ -20,16 +16,19 @@ $("#descargarPDF").on("click", function(){
 
 // ABRIR MODAL (CURSOS)
 $(document).on('click', '#altaCursos', function(){
-	$('#modalCapt').modal('show');
-	$('#titModal').text('Alta de Cursos');
+	modalCursosFill();
+	accionCurso = 'altaCursos';
+	idCurso = '';
+	tituloCursoAccion = 'Nuevo curso';
+	descCursoAccion = '¿Decea guardar este curso?';
 });
 // ABRIR MODAL (EMPRESAS)
 $(document).on('click', '#altaEmpresas', function(){
-	$('#modalCapt').modal('show');
-	$('#titModal').text('Alta de Empresas');
+	modalEmpresasFill();
 	accionEmpresa = 'altaEmpresa';
 	idEmpresa = '';
-	limpiarModalEmpresas();
+	tituloEmpresaAccion = "Nueva empresa";
+	descEmpresaAccion = "¿Decea guardar esta empresa?";
 });
 
 // CERRAR MODAL
@@ -37,14 +36,59 @@ $(document).on('click', "button[name='cerrModal']", function(){
 	$('#modalCapt').modal('hide');
 });
 
-// ABRIR PANEL DE CONSULTA
+// ABRIR PANEL DE CONSULTA EMPRESAS (ALTA EMPRESA)
 $(document).on('click', '#consulEmpresa', function(){
 	if($(this).val() === "0"){
 		$(this).val("1");
 		$('#consultaEmpresa').show(200);
+		$('#buscarEmpresa').focus();
+		$('#iconConsulEmpresa').prop('class', 'glyphicon glyphicon-remove');
 	}else if($(this).val() === "1"){
 		$(this).val("0");
 		$('#consultaEmpresa').hide(200);
+		$('#iconConsulEmpresa').prop('class', 'glyphicon glyphicon-search');
+		$('#buscarEmpresa').val('');
+		$('#tablaEmpresa').html('');
+	}
+});
+
+// ABRIR PANEL DE CONSULTA EMPRESAS (ALTA CURSOS)
+$(document).on('click', '#consulEmpresaCurso', function(){
+	if($(this).val() === "0"){
+		$(this).val("1");
+		$('#consulEmpresaDiv').show(200);
+		$('#nomEmpresa').prop("readonly", false);
+		$('#nomEmpresa').val('');
+		$('#nomEmpresa').focus();
+		idEmpresaCurso = '';
+		accionCurso = 'altaCursos';
+		idCurso = '';
+		tituloCursoAccion = 'Nuevo curso';
+		descCursoAccion = '¿Decea guardar este curso?';
+		$('#iconConculEmpresa').prop('class', 'glyphicon glyphicon-remove');
+	}else if($(this).val() === "1"){
+		$(this).val("0");
+		$('#consulEmpresaDiv').hide(200);
+		$('#iconConculEmpresa').prop('class', 'glyphicon glyphicon-search');
+		$('#nomEmpresa').val('');
+		$('#nomEmpresa').prop("readonly", true);
+		$('#tablaEmpresaCurso').html('');
+	}
+});
+// ABRIR EL PANEL DE CONSULTA DE CURSOS
+$(document).on('click', '#consulCurso', function(){
+	if($(this).val() === "0"){
+		$(this).val("1");
+		$('#consultaCurso').show(200);
+		$('#nomCurso').val('');
+		$('#nomCurso').focus();
+		$('#iconConculCurso').prop('class', 'glyphicon glyphicon-remove');
+	}else if($(this).val() === "1"){
+		$(this).val("0");
+		$('#consultaCurso').hide(200);
+		$('#iconConculCurso').prop('class', 'glyphicon glyphicon-search');
+		$('#nomCurso').val('');
+		$('#tablaCurso').html('');
 	}
 });
 
@@ -53,7 +97,120 @@ $(document).on('click', '#consulEmpresa', function(){
 // ALTA DE EMPRESA
 var accionEmpresa;
 var idEmpresa;
+var tituloEmpresaAccion;
+var descEmpresaAccion;
 $(document).on('click', '#altaEmpresa', function(){
+	if($('#empresa').val() === ''){
+		$('#empresa').focus();
+	}else if($('#rfc').val() === ''){
+		$('#rfc').focus();
+	}else if($('#patron').val() === ''){
+		$('#patron').focus();
+	}else if($('#representante').val() === ''){
+		$('#representante').focus();
+	}else{
+		if(accionEmpresa === 'editarEmpresa' && fotoPDF === 'sin-foto'){
+			$.confirm({
+			    title: 'No seleccionó imagen',
+			    content: 'Si previamente eligió una imagen para esta empresa, este cambio la eliminará\n¿Decea continuar?',
+			    buttons: {
+			        guardar: {
+			            text: 'Si, quitar imagen',
+			            btnClass: 'btn-default',
+			            action: function(){
+			            	altaEditEmpresa();
+			            }
+			        },
+			        noguardar: {
+			            text: 'Mantener imagen anterior',
+			            btnClass: 'btn-warning',
+			            action: function(){
+			            	fotoPDF = 'noeditar';
+			            	altaEditEmpresa();
+			            }
+			        }
+			    }
+			});
+		}else{
+			altaEditEmpresa();
+		}
+	}
+});
+
+// CONSULTA EMPRESA
+$(document).on('keyup', '#buscarEmpresa', function(){
+	consultEmpresa($(this).val(), 'tablaEmpresa', 'empresaAlta');
+});
+
+// CONSULTA EMPRESA (ALTA CURSO)
+$(document).on('keyup', '#nomEmpresa', function(){
+	consultEmpresa($(this).val(), 'tablaEmpresaCurso', 'empresaCurso');
+});
+
+// CONSULTA CURSO
+$(document).on('keyup', '#nomCurso', function(){
+	consultCurso($(this).val(), 'tablaCurso', 'cursoalta');
+});
+
+// ::::::::: ******** FUNCIONES CON CURSOS ******* :::
+// FUNCION ALTA CURSOS
+var accionCurso;
+var idCurso;
+var tituloCursoAccion;
+var descCursoAccion;
+$(document).on('click', '#altaCurso', function(){
+	if($('#nomEmpresa').val() === ''){
+		$('#nomEmpresa').focus();
+	}else if(idEmpresaCurso === ''){
+		alert('No');
+	}else if($('#nomCurso').val() === ''){
+		$('#nomCurso').focus();
+	}else if($('#duracion').val() === ''){
+		$('#duracion').focus();
+	}else if($('#fechaIni').val() === ''){
+		$('#fechaIni').focus();
+	}else if($('#fechaFin').val() === ''){
+		$('#fechaFin').focus();
+	}else if($('#cursosCat').val() === '-1'){
+		$('#cursosCat').focus();
+	}else if($('#capacitador').val() === ''){
+		$('#capacitador').focus();
+	}else{
+		if(accionCurso === 'editarCurso' && fotoPDF2 === 'sin-foto'){
+			$.confirm({
+			    title: 'No seleccionó imagen',
+			    content: 'Si previamente eligió una imagen para este curso, esta se eliminará\n¿Decea continuar?',
+			    buttons: {
+			        guardar: {
+			            text: 'Si, quitar imagen',
+			            btnClass: 'btn-default',
+			            action: function(){
+			            	altaEditCursos();
+			            }
+			        },
+			        noguardar: {
+			            text: 'Mantener imagen anterior',
+			            btnClass: 'btn-warning',
+			            action: function(){
+			            	fotoPDF2 = 'noeditar';
+			            	altaEditCursos();
+			            }
+			        }
+			    }
+			});
+		}else{
+			altaEditCursos();
+		}
+	}
+});
+
+// **************************************************
+// :::::::::: FUNCIONES CON BASE DE DATOS :::::::::::
+// **************************************************
+
+// -------------- EMPRESAS -----------------------
+// ALTA - EDICION EMPRESA
+function altaEditEmpresa(){
 	var jsonEmpresa = {
 		id: idEmpresa,
 		nombre: $('#empresa').val(),
@@ -62,53 +219,55 @@ $(document).on('click', '#altaEmpresa', function(){
 		representante: $('#representante').val(),
 		img: fotoPDF
 	};
-	$.ajax({
-		url:'rutas/rutaEmpresas.php',
-		type:'POST',
-		data: {info: jsonEmpresa, action: accionEmpresa},
-		dataType:'JSON',
-		error: function(error){
-			console.log(error);
-			//removeSpinner();
-		},
-		success: function(data){
-			//removeSpinner();
-			$('#modalCapt').modal('hide');
-			console.log('Exito');
-		}
-	});
-});
 
-// CONSULTA EMPRESA
-$(document).on('keyup', '#buscarEmpresa', function(){
-	var nombre = $(this).val();
-	$('#tablaEmpresa').html('');
-	if(nombre !== ''){
-		$.ajax({
-			url:'rutas/rutaEmpresas.php',
-			type:'POST',
-			data: {info: nombre, action: 'consultaEmpresa'},
-			dataType:'JSON',
-			error: function(error){
-				console.log(error);
-				//removeSpinner();
-			},
-			success: function(data){
-				//removeSpinner();
-				var tabla = "<table class='table'><thead><tr><th>Nombre</th><th>Opciones</th></tr></thead><tbody>";
-				$.each(data, function (i, campo){
-					tabla += "<tr><td>" + campo.nombre + "</td><td><button onclick='editarEmpresa("+campo.id+")'>EDITAR</button>&nbsp;&nbsp;<button onclick='borrarEmpresas("+campo.id+")'>BORRAR</button></td></tr>";
-				});
-				tabla += "</tbody></table>";
-				$('#tablaEmpresa').append(tabla);
-			}
-		});
-	}
-});
+	$.confirm({
+	    title: tituloEmpresaAccion,
+	    content: descEmpresaAccion,
+	    buttons: {
+	        guardar: {
+	            text: 'Guardar',
+	            btnClass: 'btn-default',
+	            keys: ['enter', 'shift'],
+	            action: function(){
+	               $.ajax({
+						url:'rutas/rutaEmpresas.php',
+						type:'POST',
+						data: {info: jsonEmpresa, action: accionEmpresa},
+						dataType:'JSON',
+						error: function(error){
+							console.log(error);
+							//removeSpinner();
+						},
+						success: function(data){
+							//removeSpinner();
+							limpiarModalEmpresas();
+							console.log(data);
+
+							accionEmpresa = 'altaEmpresa';
+							idEmpresa = '';
+							tituloEmpresaAccion = "Nueva empresa";
+							descEmpresaAccion = "¿Decea guardar esta empresa?";
+							$('#buscarEmpresa').val('');
+							$('#tablaEmpresa').html('');
+						}
+					});
+	            }
+	        },
+	        noguardar: {
+	            text: 'Cancelar',
+	            btnClass: 'btn-danger',
+	            keys: ['enter', 'shift'],
+	            action: function(){}
+	        }
+	    }
+	});
+}
 // FUNCION EDITAR EMPRESAS
 function editarEmpresa(id){
 	idEmpresa = id;
 	accionEmpresa = 'editarEmpresa';
+	tituloEmpresaAccion = "Editar empresa";
+	descEmpresaAccion = "¿Decea guardar los cambios?";
 
 	$.ajax({
 		url:'rutas/rutaEmpresas.php',
@@ -134,13 +293,164 @@ function editarEmpresa(id){
 		}
 	});
 }
-
 // FUNCION BAJA EMPRESA
 function borrarEmpresas(id){
+	$.confirm({
+	    title: 'Eliminar empresa',
+	    content: '¿Decea eliminar esta empresa?',
+	    buttons: {
+	        guardar: {
+	            text: 'Eliminar',
+	            btnClass: 'btn-danger',
+	            action: function(){
+	               $.ajax({
+						url:'rutas/rutaEmpresas.php',
+						type:'POST',
+						data: {info: id, action: 'bajaEmpresa'},
+						dataType:'JSON',
+						error: function(error){
+							console.log(error);
+							//removeSpinner();
+						},
+						success: function(data){
+							//removeSpinner();
+							limpiarModalEmpresas();
+							$('#consulEmpresa').click();
+							$('#buscarEmpresa').val('');
+							$('#tablaEmpresa').html('');
+						}
+					});
+	            }
+	        },
+	        noguardar: {
+	            text: 'Cancelar',
+	            btnClass: 'btn-default',
+	            action: function(){}
+	        }
+	    }
+	});
+}
+// FUNCION GLOBAL CONSULTAR EMPRESA
+function consultEmpresa(nombre, tablaId, accion){
+	$('#'+tablaId).html('');
+	if(nombre !== ''){
+		$.ajax({
+			url:'rutas/rutaEmpresas.php',
+			type:'POST',
+			data: {info: nombre, action: 'consultaEmpresa'},
+			dataType:'JSON',
+			error: function(error){
+				console.log(error);
+				//removeSpinner();
+			},
+			success: function(data){
+				//removeSpinner();
+				var tabla = "<table class='table'><thead><tr><th>Nombre</th><th>Seleccionar</th></tr></thead><tbody>";
+				$.each(data, function (i, campo){
+					if(accion === 'empresaAlta'){
+						tabla += "<tr><td>" + campo.nombre + "</td><td><button  class='btn btn-xs btn-warning' onclick='editarEmpresa("+campo.id+")'><span class='glyphicon glyphicon-pencil'></span></button>&nbsp;&nbsp;<button class='btn btn-xs btn-danger' onclick='borrarEmpresas("+campo.id+")'><span class='glyphicon glyphicon-trash'></span></button></td></tr>";
+					}else if(accion === 'empresaCurso'){
+						tabla += "<tr><td id='nomEmp_"+campo.id+"'>" + campo.nombre + "</td><td><button  class='btn btn-xs btn-primary' onclick='selecEmpresaCurso("+campo.id+")'><span class='glyphicon glyphicon-pencil'></span></button></td></tr>";
+					}else if(accion === 'empresaDoc'){
+						tabla += "<tr><td id='nomEmp_"+campo.id+"'>" + campo.nombre + "</td><td><button  class='btn btn-xs btn-primary' onclick='selecEmpresaDoc("+campo.id+")'><span class='glyphicon glyphicon-pencil'></span></button></td></tr>";
+					}
+				});
+				tabla += "</tbody></table>";
+				$('#'+tablaId).append(tabla);
+			}
+		});
+	}
+}
+
+// ------------------------------------------------
+// -------------- CURSOS -----------------------
+var idEmpresaCurso = '';
+function selecEmpresaCurso(id){
+	idEmpresaCurso = id;
+	var nomEmp = $('#nomEmp_' + id).text();
+	$('#consulEmpresaCurso').click();
+	$('#nomEmpresa').val(nomEmp);
+}
+// FUNCION ALTA DE CURSOS
+function altaEditCursos(){
+	var jsonCursos = {
+		id: idCurso,
+		idEmpresa: idEmpresaCurso,
+		nomEmpresa: $('#nomEmpresa').val(),
+		curso: $('#nomCurso').val(),
+		duracion: $('#duracion').val(),
+		inicio: $('#fechaIni').val(),
+		fin: $('#fechaFin').val(),
+		area: $('#cursosCat option:selected').text(),
+		stps: $('#capacitador').val(),
+		imagen: fotoPDF2
+	};
+
+	$.confirm({
+	    title: tituloCursoAccion,
+	    content: descCursoAccion,
+	    buttons: {
+	        guardar: {
+	            text: 'Guardar',
+	            btnClass: 'btn-default',
+	            action: function(){
+	               $.ajax({
+						url:'rutas/rutaCursos.php',
+						type:'POST',
+						data: {info: jsonCursos, action: accionCurso},
+						dataType:'JSON',
+						error: function(error){
+							console.log(error);
+							//removeSpinner();
+						},
+						success: function(data){
+							//removeSpinner();
+							$.confirm({
+							    title: 'Limpiar Campos',
+							    content: '¿Decea limpiar el formulario?',
+							    buttons: {
+							        guardar: {
+							            text: 'Limpiar',
+							            btnClass: 'btn-info',
+							            action: function(){
+							            	limpiarModalCursos();
+							            }
+							        },
+							        noguardar: {
+							            text: 'Mantener valores',
+							            btnClass: 'btn-default',
+							            action: function(){}
+							        }
+							    }
+							});
+						//FIN DE SUCCESS
+						}
+					});
+	            }
+	        },
+	        noguardar: {
+	            text: 'Cancelar',
+	            btnClass: 'btn-danger',
+	            action: function(){}
+	        }
+	    }
+	});
+}
+
+// FUNCION EDITAR CURSO
+function editarCurso(id){
+	idCurso = id;
+	if($('#consulCurso').val() === "1")
+		$('#consulCurso').click();
+
+	accionCurso = 'editarCurso';
+	tituloCursoAccion = 'Editar curso';
+	descCursoAccion = '¿Decea guardar los cambios?';
+
 	$.ajax({
-		url:'rutas/rutaEmpresas.php',
+		url:'rutas/rutaCursos.php',
 		type:'POST',
-		data: {info: id, action: 'bajaEmpresa'},
+		data: {info: idCurso, action: 'traerCurso'},
 		dataType:'JSON',
 		error: function(error){
 			console.log(error);
@@ -148,13 +458,95 @@ function borrarEmpresas(id){
 		},
 		success: function(data){
 			//removeSpinner();
-			limpiarModalEmpresas();
-			$('#consulEmpresa').click();
-			$('#buscarEmpresa').val('');
-			$('#tablaEmpresa').html('');
+			idEmpresaCurso =  data[0]["idempresa"];
+			$('#nomEmpresa').val(data[0]["nomempresa"]);
+			$('#nomCurso').val(data[0]["curso"]);
+			$('#duracion').val(data[0]["duracion"]);
+			$('#fechaIni').val(data[0]["inicio"]);
+			$('#fechaFin').val(data[0]["final"]);
+
+			var valArea = data[0]["area"].split(' - ')[0];
+			$("#cursosCat option[value='"+valArea+"']").prop('selected',true);
+
+			$('#capacitador').val(data[0]["stps"]);
+			$('#imgfile2').val('');
+
+			var c = document.getElementById("canvas2");
+			var ctx = c.getContext("2d");
+			ctx.clearRect(0, 0, c.width, c.height);
+			fotoPDF2 = 'sin-foto';
 		}
 	});
 }
+
+// FUNCION DE BORRADO DE CURSOS
+function borrarCurso(id){
+	$.confirm({
+	    title: 'Eliminar curso',
+	    content: '¿Decea eliminar este curso?',
+	    buttons: {
+	        guardar: {
+	            text: 'Eliminar',
+	            btnClass: 'btn-danger',
+	            action: function(){
+	               $.ajax({
+						url:'rutas/rutaCursos.php',
+						type:'POST',
+						data: {info: id, action: 'bajaCurso'},
+						dataType:'JSON',
+						error: function(error){
+							console.log(error);
+							//removeSpinner();
+						},
+						success: function(data){
+							//removeSpinner();
+							$('#consulCurso').click();
+							$('#nomCurso').val('');
+							$('#tablaCurso').html('');
+						}
+					});
+	            }
+	        },
+	        noguardar: {
+	            text: 'Cancelar',
+	            btnClass: 'btn-default',
+	            action: function(){}
+	        }
+	    }
+	});
+}
+
+// FUNCION DE CONSULTA DE CURSO
+function consultCurso(nombre, tablaId, accion){
+	$('#'+tablaId).html('');
+	if(nombre !== ''){
+		$.ajax({
+			url:'rutas/rutaCursos.php',
+			type:'POST',
+			data: {info: nombre, action: 'consultaCurso'},
+			dataType:'JSON',
+			error: function(error){
+				console.log(error);
+				//removeSpinner();
+			},
+			success: function(data){
+				//removeSpinner();
+				var tabla = "<table class='table'><thead><tr><th>Curso</th><th>Empresa</th><th>Seleccionar</th></tr></thead><tbody>";
+				$.each(data, function (i, campo){
+					if(accion === 'cursoalta'){
+						tabla += "<tr><td>" + campo.curso + "</td><td>" + campo.nomempresa + "</td><td><button  class='btn btn-xs btn-warning' onclick='editarCurso("+campo.id+")'><span class='glyphicon glyphicon-pencil'></span></button>&nbsp;&nbsp;<button class='btn btn-xs btn-danger' onclick='borrarCurso("+campo.id+")'><span class='glyphicon glyphicon-trash'></span></button></td></tr>";
+					}
+				});
+				tabla += "</tbody></table>";
+				$('#'+tablaId).append(tabla);
+			}
+		});
+	}
+}
+// ************************************************
+// :::::::::::: FIN FUNCONES BASES DE DATOS :::::::
+// ************************************************
+
 
 // FUNCION LIMPIAR CAMPOS MODAL (EMPRESAS)
 function limpiarModalEmpresas(){
@@ -165,6 +557,24 @@ function limpiarModalEmpresas(){
 	$('#imgfile').val('');
 
 	var c = document.getElementById("canvas");
+	var ctx = c.getContext("2d");
+	ctx.clearRect(0, 0, c.width, c.height);
+	fotoPDF = 'sin-foto';
+}
+
+// FUNCION LIMPIAR CAMPOS MODAL (CURSOS)
+function limpiarModalCursos(){
+	idEmpresaCurso =  '';
+	$('#nomEmpresa').val('');
+	$('#nomCurso').val('');
+	$('#duracion').val('');
+	$('#fechaIni').val('');
+	$('#fechaFin').val('');
+	$("#cursosCat option[value='-1']").prop('selected',true);
+	$('#capacitador').val('');
+	$('#imgfile2').val('');
+
+	var c = document.getElementById("canvas2");
 	var ctx = c.getContext("2d");
 	ctx.clearRect(0, 0, c.width, c.height);
 	fotoPDF = 'sin-foto';
@@ -189,6 +599,64 @@ function leerCatalogos(){
 	});
 }
 
+
+// ************** FUNCIONES CON EL FOMULARIO *********
+$(document).on('click', '#buscarEmpleadoDoc', function(){
+	$('#titModal').text('Elegir Empresa');
+	$('#modalCapt').modal('show');
+});
+
+// BUSCAR EMPRESA
+$(document).on('keyup', '#buscarEmpresaDoc', function(){
+	consultEmpresa($(this).val(), 'tablaEmpresasDoc', 'empresaDoc');
+});
+
+// FUNCION TRAER CURSOS
+function selecEmpresaDoc(id){
+	$('#selectEmpresa').val($('#nomEmp_' + id).text());
+	$('#selectCurso').html('');
+	$.ajax({
+		url:'rutas/rutaTrabajador.php',
+		type:'POST',
+		data: {info: id, action: 'traerCursoEmpresa'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			//removeSpinner();
+			var option = '<option value="-1">- Seleccione el curso -</option>';
+			$.each(data, function (i, campo){
+				option += "<option value='" + campo.id +"'>" + campo.curso + "</option>";
+			});
+			$('#selectCurso').append(option);
+
+			llenarDataEmpresas(id);
+		}
+	});
+	$('#modalCapt').modal('hide');
+}
+
+$(document).on('change', '#selectCurso', function(){
+	if($(this).val() !== '-1'){
+		$.ajax({
+			url:'rutas/rutaTrabajador.php',
+			type:'POST',
+			data: {info: $(this).val(), action: 'traerDatosCurso'},
+			dataType:'JSON',
+			error: function(error){
+				console.log(error);
+				//removeSpinner();
+			},
+			success: function(data){
+				//removeSpinner();
+				console.log(data);
+			}
+		});
+	}
+})
+
 // FUNCION LLENADO DINAMICO DE DATOS
 function llenarCatalogoSelect(json){
 	$('#cursosCat').html('');
@@ -206,8 +674,33 @@ function llenarCatalogoSelect(json){
 	$('#empleosCat').append(empleoOptions);
 }
 // FUNCION LLENAR VARIABLES
-var nombreTXT, curpTXT, ocupacionTXT, puestoTXT, empresaTXT, shcpTXT, cursoTXT, duracionTXT, initTXT, finTXT, clvcursoTXT, stpsTXT;
 
+
+function llenarDataEmpresas(id){
+	$.ajax({
+		url:'rutas/rutaTrabajador.php',
+		type:'POST',
+		data: {info: id, action: 'traerDataEmpresa'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			console.log(data);
+			$.each(data, function (i, campo){
+				empresaTXT = campo.nombre;
+				shcpTXT = campo.rfc;
+				patronTXT = campo.jefe;
+				representanteTXT = campo.representante;
+			});
+			//removeSpinner();
+		}
+	});
+}
+
+
+var nombreTXT, curpTXT, ocupacionTXT, puestoTXT, empresaTXT, shcpTXT, cursoTXT, duracionTXT, initTXT, finTXT, clvcursoTXT, stpsTXT, patronTXT, representanteTXT;
 var nombreSAVE, curpSAVE, ocupacionSAVE, puestoSAVE, empresaSAVE, shcpSAVE, cursoSAVE, duracionSAVE, initSAVE, finSAVE, clvcursoSAVE, stpsSAVE;
 function configValsPDF(){
 	var temIniFecha = initTXT;
@@ -231,6 +724,7 @@ function configValsPDF(){
 	crearDocumento();
 }
 
+// ::::::::::::: FUNCION CON EL DOCUMENTO :::::::::::
 // FUNCION QUE LLENA LAS VARS DESDE EL FORMULARIO
 function valsFormulario(){
 	nombreTXT = $('#nomEmpleado').val();
