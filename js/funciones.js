@@ -218,13 +218,20 @@ $(document).on('click', '#altaCurso', function(){
 // -------------- EMPRESAS -----------------------
 // ALTA - EDICION EMPRESA
 function altaEditEmpresa(){
+	var imgNombre;
+	if($('#imgfile').val() !== ''){
+		cadenaRandom(8);
+		imgNombre = cadAleatoria;
+	}else{
+		imgNombre = 'sin-foto';
+	}
 	var jsonEmpresa = {
 		id: idEmpresa,
 		nombre: $('#empresa').val(),
 		rfc: $('#rfc').val(),
 		patron: $('#patron').val(),
 		representante: $('#representante').val(),
-		img: fotoPDF
+		img: imgNombre
 	};
 
 	$.confirm({
@@ -247,17 +254,48 @@ function altaEditEmpresa(){
 						},
 						success: function(data){
 							//removeSpinner();
-							limpiarModalEmpresas();
+							if(imgNombre !== 'sin-foto'){
+								var imgEmpresa = document.getElementById("imgfile").files[0];
+								var data = new FormData();
+								data.append('archivo', imgEmpresa);
+								data.append('nombre', cadAleatoria);
 
-							accionEmpresa = 'altaEmpresa';
-							idEmpresa = '';
-							tituloEmpresaAccion = "Nueva empresa";
-							descEmpresaAccion = "¿Decea guardar esta empresa?";
-							$('#buscarEmpresa').val('');
-							$('#tablaEmpresa').html('');
-							msgMulti('Exito', 'Empresa guardada con exito', 6000, 'success');
+								$.ajax({
+									url: "clases/imgBase64.php",
+									type: "POST",
+									cache: false,
+									contentType: false,
+									data: data,
+									processData: false,
+									error: function(error){
+										console.log(error);
+										//removeSpinner();
+									},
+									success: function(data){
+										accionEmpresa = 'altaEmpresa';
+										idEmpresa = '';
+										tituloEmpresaAccion = "Nueva empresa";
+										descEmpresaAccion = "¿Decea guardar esta empresa?";
+										$('#buscarEmpresa').val('');
+										$('#tablaEmpresa').html('');
+										msgMulti('Exito', 'Empresa guardada con exito', 6000, 'success');
+										limpiarModalEmpresas();
+									}
+								});
+							}else{
+								accionEmpresa = 'altaEmpresa';
+								idEmpresa = '';
+								tituloEmpresaAccion = "Nueva empresa";
+								descEmpresaAccion = "¿Decea guardar esta empresa?";
+								$('#buscarEmpresa').val('');
+								$('#tablaEmpresa').html('');
+								msgMulti('Exito', 'Empresa guardada con exito', 6000, 'success');
+								limpiarModalEmpresas();
+							}
+
 						}
 					});
+
 	            }
 	        },
 	        noguardar: {
@@ -381,6 +419,13 @@ function selecEmpresaCurso(id){
 }
 // FUNCION ALTA DE CURSOS
 function altaEditCursos(){
+	var imgNombre;
+	if($('#imgfile').val() !== ''){
+		cadenaRandom(8);
+		imgNombre = cadAleatoria;
+	}else{
+		imgNombre = 'sin-foto';
+	}
 	var jsonCursos = {
 		id: idCurso,
 		idEmpresa: idEmpresaCurso,
@@ -391,7 +436,7 @@ function altaEditCursos(){
 		fin: $('#fechaFin').val(),
 		area: $('#cursosCat option:selected').text(),
 		stps: $('#capacitador').val(),
-		imagen: fotoPDF2
+		imagen: imgNombre
 	};
 
 	$.confirm({
@@ -413,7 +458,35 @@ function altaEditCursos(){
 						},
 						success: function(data){
 							//removeSpinner();
-							$.confirm({
+
+							if(imgNombre !== 'sin-foto'){
+								var imgEmpresa = document.getElementById("imgfile2").files[0];
+								var data = new FormData();
+								data.append('archivo', imgEmpresa);
+								data.append('nombre', cadAleatoria);
+
+								$.ajax({
+									url: "clases/imgBase64.php",
+									type: "POST",
+									cache: false,
+									contentType: false,
+									data: data,
+									processData: false,
+									error: function(error){
+										console.log(error);
+										//removeSpinner();
+									},
+									success: function(data){
+										limpiarModalCursos();
+							            msgMulti('Exito', 'Curso guardado con exito', 6000, 'success');
+									}
+								});
+							}else{
+								limpiarModalCursos();
+							    msgMulti('Exito', 'Curso guardado con exito', 6000, 'success');
+							}
+
+							/*$.confirm({
 							    title: 'Limpiar Campos',
 							    content: '¿Decea limpiar el formulario?',
 							    buttons: {
@@ -433,7 +506,7 @@ function altaEditCursos(){
 							            }
 							        }
 							    }
-							});
+							});*/
 						//FIN DE SUCCESS
 						}
 					});
@@ -707,13 +780,6 @@ function llenarCatalogoSelect(json){
 
 
 function llenarDataEmpresas(id){
-	var canvas = document.getElementById("img1");
-    var ctx = canvas.getContext("2d");
-    var image = new Image();
-    image.onload = function () {
-    	ctx.drawImage(image, 0, 0);
-	}
-
 	$.ajax({
 		url:'rutas/rutaTrabajador.php',
 		type:'POST',
@@ -724,28 +790,40 @@ function llenarDataEmpresas(id){
 			//removeSpinner();
 		},
 		success: function(data){
+			var jsonIMG;
 			$.each(data, function (i, campo){
 				empresaSAVE = campo.nombre;
 				shcpSAVE = campo.rfc;
 				patronSAVE = campo.jefe;
 				representanteSAVE = campo.representante;
-				imgEmpSAVE = campo.imagen;
+				jsonIMG = campo.imagen;
 			});
-
-			setTimeout(function(){
-				image.src = imgEmpSAVE;
-
+			// LLENADO DE CODIGO BASE64 (SI EXISTE)
+			if(jsonIMG !== 'sin-foto'){
+				$.getJSON( "json/" + jsonIMG + ".json", function( data ) {
+					$.each(data, function( key, val) {
+						imgEmpSAVE = val[0]["codigo"];
+					});
+				}).done(function(){
+					msgMulti('Datos de empresa', '<b>RFC: </b>' + shcpSAVE + '\n<b>Jefe: </b>' + patronSAVE + '\n<b>Representante: </b>' + representanteSAVE, 15000, 'info');
+				});
+			}else{
+				imgEmpSAVE = jsonIMG;
 				msgMulti('Datos de empresa', '<b>RFC: </b>' + shcpSAVE + '\n<b>Jefe: </b>' + patronSAVE + '\n<b>Representante: </b>' + representanteSAVE, 15000, 'info');
-			}, 800);
-
-			//removeSpinner();
+			}
 		}
 	});
 }
 
-
-var nombreTXT, curpTXT, ocupacionTXT, puestoTXT, empresaTXT, shcpTXT, cursoTXT, duracionTXT, initTXT, finTXT, clvcursoTXT, stpsTXT, patronTXT, representanteTXT;
-var nombreSAVE, curpSAVE, ocupacionSAVE, puestoSAVE, empresaSAVE, shcpSAVE, cursoSAVE, duracionSAVE, initSAVE, finSAVE, clvcursoSAVE, stpsSAVE, patronSAVE, representanteSAVE, imgEmpSAVE, imgCursoSAVE;
+// VARIABLES DE LLENADO DE DATOS PARA CREAR DOCUMENTO
+// VARIABLES FIJAS
+var nombreTXT, curpTXT, ocupacionTXT, puestoTXT, empresaTXT;
+var shcpTXT, cursoTXT, duracionTXT, initTXT, finTXT, clvcursoTXT;
+var stpsTXT, patronTXT, representanteTXT;
+// VARIABLES MANIPULABLES
+var nombreSAVE, curpSAVE, ocupacionSAVE, puestoSAVE, empresaSAVE;
+var shcpSAVE, cursoSAVE, duracionSAVE, initSAVE, finSAVE, clvcursoSAVE;
+var stpsSAVE, patronSAVE, representanteSAVE, imgEmpSAVE, imgCursoSAVE;
 function configValsPDF(){
 	var temIniFecha = initTXT;
 	var temFinFecha = finTXT;
@@ -849,6 +927,7 @@ function valsFormulario(){
 	}
 }
 
+// ::::::::::: FUNCIONES MISCELANEAS :::::::::::::::::
 // FUNCION GLOBAL DE MENSAJE ALERT PARA NOTIFICACIONES
 function msgMulti(titulo, descip, tiempo, tipo){
 	new PNotify({
@@ -858,6 +937,17 @@ function msgMulti(titulo, descip, tiempo, tipo){
 		delay: tiempo
 	});
 }
+var cadAleatoria;
+function cadenaRandom(lng){
+	cadAleatoria = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < lng; i++ )
+        cadAleatoria += possible.charAt(Math.floor(Math.random() * possible.length));
+    return cadAleatoria;
+}
+// ::::::::::: FIN FUNCIONES MISCELANEAS :::::::::::::
+
 //var prubIMG = "{image: fotoPDF, height: 70, alignment: 'left', border: [false, false, false, false]}, {image: fotoPDF, height: 70, alignment: 'right', border: [false, false, false, false]}";
 var imgTxtEmp;
 var imgTxtCurso;

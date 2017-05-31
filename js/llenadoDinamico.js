@@ -3,6 +3,7 @@
 $(function(){
 	// TRAER LOS CATALOGOS
 	leerCatalogos();
+	cuerpoHTMLFill();
 });
 
 // CARGADO DE IMAGENES (ALTA DE EMPRESAS)
@@ -264,7 +265,7 @@ function modalEmpresasFill(){
 
 						'<div class="row">'+
 							'<div class="col-md-6">'+
-								'<input type="file" id="imgfile" /><br>'+
+								'<input name="empresa" type="file" id="imgfile" /><br>'+
 							'</div>'+
 							'<div class="col-md-6">'+
 								'<canvas id="canvas" class="img-thumbnail"></canvas>'+

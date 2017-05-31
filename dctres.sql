@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `empresas` (
 	`rfc` varchar(300) COLLATE utf8_bin DEFAULT NULL,
 	`jefe` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`representante` varchar(500) COLLATE utf8_bin DEFAULT NULL,
-	`imagen` LONGTEXT CHARACTER SET ascii,
+	`imagen` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`status` varchar(20) COLLATE utf8_bin DEFAULT '1',
 PRIMARY KEY (`id`),
 	KEY `rfc` (`rfc`)
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `cursos` (
 	`final` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`area` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`stps` varchar(500) COLLATE utf8_bin DEFAULT NULL,
-	`imagen` LONGTEXT CHARACTER SET ascii,
+	`imagen` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`status` varchar(20) COLLATE utf8_bin DEFAULT '1',
 PRIMARY KEY (`id`),
 	KEY `idempresa` (`idempresa`)
