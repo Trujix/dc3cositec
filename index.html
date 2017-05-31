@@ -17,8 +17,7 @@
   	<script src="bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
-	
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+	<nav id="barraPrinc" class="navbar navbar-inverse navbar-fixed-top" hidden>
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -38,86 +37,20 @@
       </div>
     </nav>
 
-	<div class="container theme-showcase" role="main">
+	<div id="cuerpo" class="container theme-showcase" role="main">
 
-		<div class="panel panel-primary">
-			<div class="panel-heading">DATOS DEL TRABAJADOR</div>
-			<div class="panel-body">
+      <form class="form-signin">
+        <h2 class="form-signin-heading">Iniciar Sesion</h2>
+        <label for="inputEmail" class="sr-only">Usuario</label>
+        <input type="email" id="user" class="form-control" placeholder="Uusario" required autofocus>
+        <label for="inputPassword" class="sr-only">Contraseña</label>
+        <input type="password" id="pass" class="form-control" placeholder="Contraseña" required>
+        <div class="checkbox">
+        </div>
+        <button id="loginBTN" class="btn btn-lg btn-primary btn-block">Iniciar Sesion</button>
+      </form>
 
-				<div class="row">
-					<div class="col-md-7">
-						<div class="input-group">
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
-							</span>
-							<input id="nomEmpleado" type="text" class="form-control" placeholder="Nombre (Anotar apellido paterno, apellido materno y nombre (s))" />
-						</div>
-					</div>
-
-					<div class="col-md-5">
-						<div class="input-group">
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
-							</span>
-							<input id="curp" type="text" class="form-control" Placeholder="CURP (Clave Unica de Registro de Poblacion)" maxlength="18" />
-						</div>
-					</div>
-				</div><br>
-
-				<div class="row">
-					<div class="col-md-7">
-						<select id="empleosCat" class="form-control"></select>
-					</div>
-					<div class="col-md-5">
-						<input id="puesto" type="text" class="form-control" Placeholder="Puesto" />
-					</div>
-				</div>
-
-			</div>
-		</div>
-
-		<div class="panel panel-warning">
-			<div class="panel-heading">SELECCIONE EMPRESA Y CURSO</div>
-			<div class="panel-body">
-
-				<div class="row">
-					<div class="col-md-6">
-						<div class="input-group">
-							<span class="input-group-btn">
-								<button id="buscarEmpleadoDoc" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
-							</span>
-							<input id="selectEmpresa" type="text" class="form-control" placeholder="Nombre de la empresa" readonly="true" />
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<select id="selectCurso" class="form-control">
-							<option value="-1">- Seleccione el curso -</option>
-						</select>
-					</div>
-				</div>
-
-			</div>
-		</div>
-
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<div class="row">
-					<div class="col-md-4">
-						<button id="visualizarPDF" value="1" class="btn btn-default">
-							<span class="glyphicon glyphicon-print"></span> Visualizar Documento
-						</button>
-					</div>
-					<div class="col-md-4">
-						<button id="descargarPDF" value="2" class="btn btn-default">
-							<span class="glyphicon glyphicon-save"></span> Descargar Documento
-						</button>
-					</div>
-				</div>		
-			</div>
-		</div>
-
-	</div>
+    </div> 
 
 	<!-- MODAL MULTIUSOS -->
 	<div id="modalCapt" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
@@ -129,21 +62,6 @@
 	    	</div>
 	    	<div id="modalCuerpo" class="modal-body">
 	    	<!-- INICIO CONTENIDO -->
-
-	    		<div class="row">
-	    			<div class="col-md-12">
-	    				<input id="buscarEmpresaDoc" type="text" class="form-control" placeholder="Escriba el nombre de la empresa" />
-	    			</div>
-	    		</div><br>
-	    		<div class="row">
-	    			<div class="col-md-12">
-	    				<br>
-	    				<div class="tablaConsulta2">
-	    					<div id="tablaEmpresasDoc" class="table-responsive"></div>
-	    				</div>
-	    			</div>
-	    		</div>
-
 			<!-- FIN CONTENIDO -->
 			</div>
 	    </div>

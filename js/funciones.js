@@ -4,15 +4,19 @@ var empresaNuevo = true;
 var cursoNuevo = true;
 
 var accionPDF = 0;
-$("#visualizarPDF").on("click", function(){
+$(document).on("click", "#visualizarPDF" ,function(){
 	accionPDF = parseInt($(this).val());
 	valsFormulario();
 });
 
-$("#descargarPDF").on("click", function(){
+$(document).on("click", "#descargarPDF", function(){
 	accionPDF = parseInt($(this).val());
 	valsFormulario();
 });
+
+$(document).on('click', '#limpiarTrabajador', function(){
+	limpiarTrabajador();
+})
 
 // ABRIR MODAL (CURSOS)
 $(document).on('click', '#altaCursos', function(){
@@ -104,6 +108,9 @@ $(document).on('click', '#altaEmpresa', function(){
 		$('#empresa').focus();
 	}else if($('#rfc').val() === ''){
 		$('#rfc').focus();
+	}else if($('#rfc').val().length < 12){
+		$('#rfc').focus();
+		msgMulti('Error RFC', 'Formato de RFC incorrecto\n\n<b>Debe contener de 12 a 13 caracteres</b>', 12000, 'error');
 	}else if($('#patron').val() === ''){
 		$('#patron').focus();
 	}else if($('#representante').val() === ''){
@@ -241,7 +248,6 @@ function altaEditEmpresa(){
 						success: function(data){
 							//removeSpinner();
 							limpiarModalEmpresas();
-							console.log(data);
 
 							accionEmpresa = 'altaEmpresa';
 							idEmpresa = '';
@@ -249,6 +255,7 @@ function altaEditEmpresa(){
 							descEmpresaAccion = "¿Decea guardar esta empresa?";
 							$('#buscarEmpresa').val('');
 							$('#tablaEmpresa').html('');
+							msgMulti('Exito', 'Empresa guardada con exito', 6000, 'success');
 						}
 					});
 	            }
@@ -318,6 +325,7 @@ function borrarEmpresas(id){
 							$('#consulEmpresa').click();
 							$('#buscarEmpresa').val('');
 							$('#tablaEmpresa').html('');
+							msgMulti('Exito', 'Empresa eliminada con exito', 6000, 'success');
 						}
 					});
 	            }
@@ -414,12 +422,15 @@ function altaEditCursos(){
 							            btnClass: 'btn-info',
 							            action: function(){
 							            	limpiarModalCursos();
+							            	msgMulti('Exito', 'Curso guardado con exito', 6000, 'success');
 							            }
 							        },
 							        noguardar: {
 							            text: 'Mantener valores',
 							            btnClass: 'btn-default',
-							            action: function(){}
+							            action: function(){
+							            	msgMulti('Exito', 'Curso guardado con exito', 6000, 'success');
+							            }
 							        }
 							    }
 							});
@@ -503,6 +514,7 @@ function borrarCurso(id){
 							$('#consulCurso').click();
 							$('#nomCurso').val('');
 							$('#tablaCurso').html('');
+							msgMulti('Exito', 'Curso eliminado con exito', 6000, 'success');
 						}
 					});
 	            }
@@ -548,39 +560,7 @@ function consultCurso(nombre, tablaId, accion){
 // ************************************************
 
 
-// FUNCION LIMPIAR CAMPOS MODAL (EMPRESAS)
-function limpiarModalEmpresas(){
-	$('#empresa').val('');
-	$('#rfc').val('');
-	$('#patron').val('');
-	$('#representante').val('');
-	$('#imgfile').val('');
-
-	var c = document.getElementById("canvas");
-	var ctx = c.getContext("2d");
-	ctx.clearRect(0, 0, c.width, c.height);
-	fotoPDF = 'sin-foto';
-}
-
-// FUNCION LIMPIAR CAMPOS MODAL (CURSOS)
-function limpiarModalCursos(){
-	idEmpresaCurso =  '';
-	$('#nomEmpresa').val('');
-	$('#nomCurso').val('');
-	$('#duracion').val('');
-	$('#fechaIni').val('');
-	$('#fechaFin').val('');
-	$("#cursosCat option[value='-1']").prop('selected',true);
-	$('#capacitador').val('');
-	$('#imgfile2').val('');
-
-	var c = document.getElementById("canvas2");
-	var ctx = c.getContext("2d");
-	ctx.clearRect(0, 0, c.width, c.height);
-	fotoPDF = 'sin-foto';
-}
-
-
+// :::::::::::::::::::::::::::::::::::
 // FUNCIONES CON CATALOGOS
 function leerCatalogos(){
 	$.ajax({
@@ -598,12 +578,12 @@ function leerCatalogos(){
 		}
 	});
 }
+// :::::::::::::::::::::::::::::::::::
 
 
 // ************** FUNCIONES CON EL FOMULARIO *********
 $(document).on('click', '#buscarEmpleadoDoc', function(){
-	$('#titModal').text('Elegir Empresa');
-	$('#modalCapt').modal('show');
+	modalBusqEmpresaFill();
 });
 
 // BUSCAR EMPRESA
@@ -652,11 +632,61 @@ $(document).on('change', '#selectCurso', function(){
 			success: function(data){
 				//removeSpinner();
 				console.log(data);
+				$.each(data, function (i, campo){
+					cursoSAVE = campo.curso;
+					duracionSAVE = campo.duracion;
+					initSAVE = campo.inicio;
+					finSAVE = campo.final;
+					clvcursoSAVE = campo.area;
+					stpsSAVE = campo.stps;
+					imgCursoSAVE = campo.imagen;
+				});
+				msgMulti('Datos de curso', '<b>Duracion (hrs): </b>' + duracionSAVE + '\n<b>Inicia: </b>' + initSAVE + '\n<b>Concluye: </b>' + finSAVE + '\n<b>Clave de Area: </b>' + clvcursoSAVE+ '\n<b>Capacitador: </b>' + stpsSAVE, 15000, 'info');
 			}
 		});
 	}
 })
 
+// FUNCION LIMPIAR CAMPOS MODAL (EMPRESAS)
+function limpiarModalEmpresas(){
+	$('#empresa').val('');
+	$('#rfc').val('');
+	$('#patron').val('');
+	$('#representante').val('');
+	$('#imgfile').val('');
+
+	var c = document.getElementById("canvas");
+	var ctx = c.getContext("2d");
+	ctx.clearRect(0, 0, c.width, c.height);
+	fotoPDF = 'sin-foto';
+}
+
+// FUNCION LIMPIAR CAMPOS MODAL (CURSOS)
+function limpiarModalCursos(){
+	idEmpresaCurso =  '';
+	$('#nomEmpresa').val('');
+	$('#nomCurso').val('');
+	$('#duracion').val('');
+	$('#fechaIni').val('');
+	$('#fechaFin').val('');
+	$("#cursosCat option[value='-1']").prop('selected',true);
+	$('#capacitador').val('');
+	$('#imgfile2').val('');
+
+	var c = document.getElementById("canvas2");
+	var ctx = c.getContext("2d");
+	ctx.clearRect(0, 0, c.width, c.height);
+	fotoPDF = 'sin-foto';
+}
+// FUNCION LIMPIAR DATOS TRABAJADOR
+function limpiarTrabajador(){
+	$("#empleosCat option[value='-1']").prop('selected',true);
+	$('#nomEmpleado').val('');
+	$('#curp').val('');
+	$('#puesto').val('');
+}
+
+// *****************************************
 // FUNCION LLENADO DINAMICO DE DATOS
 function llenarCatalogoSelect(json){
 	$('#cursosCat').html('');
@@ -687,13 +717,16 @@ function llenarDataEmpresas(id){
 			//removeSpinner();
 		},
 		success: function(data){
-			console.log(data);
 			$.each(data, function (i, campo){
-				empresaTXT = campo.nombre;
-				shcpTXT = campo.rfc;
-				patronTXT = campo.jefe;
-				representanteTXT = campo.representante;
+				empresaSAVE = campo.nombre;
+				shcpSAVE = campo.rfc;
+				patronSAVE = campo.jefe;
+				representanteSAVE = campo.representante;
+				imgEmpSAVE = campo.imagen;
 			});
+			setTimeout(function(){
+				msgMulti('Datos de empresa', '<b>RFC: </b>' + shcpSAVE + '\n<b>Jefe: </b>' + patronSAVE + '\n<b>Representante: </b>' + representanteSAVE, 15000, 'info');
+			}, 400);
 			//removeSpinner();
 		}
 	});
@@ -701,7 +734,7 @@ function llenarDataEmpresas(id){
 
 
 var nombreTXT, curpTXT, ocupacionTXT, puestoTXT, empresaTXT, shcpTXT, cursoTXT, duracionTXT, initTXT, finTXT, clvcursoTXT, stpsTXT, patronTXT, representanteTXT;
-var nombreSAVE, curpSAVE, ocupacionSAVE, puestoSAVE, empresaSAVE, shcpSAVE, cursoSAVE, duracionSAVE, initSAVE, finSAVE, clvcursoSAVE, stpsSAVE;
+var nombreSAVE, curpSAVE, ocupacionSAVE, puestoSAVE, empresaSAVE, shcpSAVE, cursoSAVE, duracionSAVE, initSAVE, finSAVE, clvcursoSAVE, stpsSAVE, patronSAVE, representanteSAVE, imgEmpSAVE, imgCursoSAVE;
 function configValsPDF(){
 	var temIniFecha = initTXT;
 	var temFinFecha = finTXT;
@@ -721,48 +754,103 @@ function configValsPDF(){
 		}
 	}
 
-	crearDocumento();
+	//var prubIMG = "{image: fotoPDF, height: 70, alignment: 'left', border: [false, false, false, false]}, {image: fotoPDF, height: 70, alignment: 'right', border: [false, false, false, false]}";
+	//var contTXTIMG = "[[{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]},{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]}]]";
+	//if(imgEmpSAVE === 'sin-foto'){
+		imgTxtEmp = "{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]}";
+	/*}else{
+		imgTxtEmp = "{image: imgEmpSAVE, height: 70, alignment: 'left', border: [false, false, false, false]}";
+	}*/
+
+	//if(imgCursoSAVE === 'sin-foto'){
+		imgTxtCurso = "{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]}";
+	/*}else{
+		imgTxtCurso = "{image: imgCursoSAVE, height: 70, alignment: 'left', border: [false, false, false, false]}";
+	}*/
+
+	contTXTIMG = "[[" + imgTxtEmp + "," + imgTxtCurso + "]]";
+
+	setTimeout(function(){
+		crearDocumento();
+	}, 500);
 }
 
 // ::::::::::::: FUNCION CON EL DOCUMENTO :::::::::::
 // FUNCION QUE LLENA LAS VARS DESDE EL FORMULARIO
 function valsFormulario(){
-	nombreTXT = $('#nomEmpleado').val();
+	if($('#nomEmpleado').val() === ''){
+		msgMulti('Error', 'Coloque el nombre del trabajador', 6000,'error');
+		$('#nomEmpleado').focus();
+	}else if($('#curp').val() === ''){
+		msgMulti('Error', 'Escriba la CURP del trabajador', 6000,'error');
+		$('#curp').focus();
+	}else if($('#curp').val().length < 17){
+		msgMulti('Error', 'La estructura de la CURP es incorrecta\n\n<b>No debe ser inferior a 17 caracteres</b>', 10000,'error');
+		$('#curp').focus();
+	}else if($('#empleosCat').val() === '-1'){
+		msgMulti('Error', 'Seleccione la ocupacion', 6000,'error');
+		$('#empleosCat').focus();
+	}else if($('#puesto').val() === ''){
+		msgMulti('Error', 'Escriba el puesto del trabajador', 6000,'error');
+		$('#puesto').focus();
+	}else if($('#selectEmpresa').val() === ''){
+		msgMulti('Error', 'Eliga la empresa', 6000,'error');
+	}else if($('#selectCurso').val() === '-1'){
+		msgMulti('Error', 'Eliga el curso', 6000,'error');
+		$('#selectCurso').focus();
+	}else{
+		nombreTXT = $('#nomEmpleado').val();
 
-	curpTXT = $('#curp').val();
-	curpTXT = curpTXT.split('');
-	if(curpTXT.length < 18){
-		var curpNum = 18 - curpTXT.length;
-		for(c = 0; c < curpNum; c++){
-			curpTXT.push('');
+		curpTXT = $('#curp').val();
+		curpTXT = curpTXT.split('');
+		if(curpTXT.length < 18){
+			var curpNum = 18 - curpTXT.length;
+			for(c = 0; c < curpNum; c++){
+				curpTXT.push('');
+			}
 		}
-	}
 
-	ocupacionTXT = $('#empleosCat option:selected').text();
-	puestoTXT = $('#puesto').val();
+		ocupacionTXT = $('#empleosCat option:selected').text();
+		puestoTXT = $('#puesto').val();
 
-	empresaTXT = $('#empresa').val();
+		empresaTXT = empresaSAVE;
 
-	shcpTXT = $('#rfc').val().split('');
-	if(shcpTXT.length < 13){
-		var shcpAux = [''];
-		for(r = 0; r < shcpTXT.length; r++){
-			shcpAux.push(shcpTXT[r]);
+		shcpTXT = shcpSAVE.split('');
+		if(shcpTXT.length < 13){
+			var shcpAux = [''];
+			for(r = 0; r < shcpTXT.length; r++){
+				shcpAux.push(shcpTXT[r]);
+			}
+			shcpTXT = [];
+			shcpTXT = shcpAux;
 		}
-		shcpTXT = [];
-		shcpTXT = shcpAux;
+
+		cursoTXT = cursoSAVE;
+		duracionTXT = duracionSAVE;
+		initTXT = initSAVE.split('-');
+		finTXT = finSAVE.split('-');
+		clvcursoTXT = clvcursoSAVE;
+		stpsTXT = stpsSAVE;
+		patronTXT = patronSAVE;
+		representanteTXT = representanteSAVE;
+
+		configValsPDF();
 	}
-
-	cursoTXT = $('#nomCurso').val();
-	duracionTXT = $('#duracion').val();
-	initTXT = $('#fechaIni').val().split('-');
-	finTXT = $('#fechaFin').val().split('-');
-	clvcursoTXT = $('#cursosCat option:selected').text();
-	stpsTXT = $('#capacitador').val();
-
-	configValsPDF();
 }
 
+// FUNCION GLOBAL DE MENSAJE ALERT PARA NOTIFICACIONES
+function msgMulti(titulo, descip, tiempo, tipo){
+	new PNotify({
+		title: titulo,
+		text: descip,
+		type: tipo,
+		delay: tiempo
+	});
+}
+//var prubIMG = "{image: fotoPDF, height: 70, alignment: 'left', border: [false, false, false, false]}, {image: fotoPDF, height: 70, alignment: 'right', border: [false, false, false, false]}";
+var imgTxtEmp;
+var imgTxtCurso;
+var contTXTIMG; //= "[[{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]},{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]}]]";
 // ::::::::::::::::: ****** ::::::::::::::
 // ********** FUNCION QUE CREA EL PDF ****
 function crearDocumento(){
@@ -785,6 +873,7 @@ function crearDocumento(){
 		}
 	};
 	// CREACION DEL DOCUMENTO
+	var tabla = eval(contTXTIMG);
 	var doc = {
 		pageSize: 'LETTER',
 		pageOrientation: 'portrait',
@@ -794,8 +883,14 @@ function crearDocumento(){
 				text: 'En este espacio la empresa puede imprimir su logotipo y, en su caso, también se puede imprimir el del agente capacitador externo',
 				style: 'encabezado'
 			},
-			{
+			/*{
 				text: '\n\n\n\n\n',
+			},*/
+			{
+				table: {
+					widths: ['*', '*'],
+					body: tabla
+				}
 			},
 			{
 				text: 'FORMATO DC-3\nCONSTANCIA DE COMPETENCIAS O DE HABILIDADES LABORALES\n',
@@ -858,7 +953,7 @@ function crearDocumento(){
 					widths: ['*'],
 					body: [
 						[{text: 'DATOS DE LA EMPRESA', style: 'tituloTabla', fillColor: 'black'}],
-						[{text: 'Nombre o razón social (En caso de persona física, anotar apellido paterno, apellido materno y nombre(s))\n\n\n', style: 'descripTabla'}],
+						[{text: 'Nombre o razón social (En caso de persona física, anotar apellido paterno, apellido materno y nombre(s))\n\n'+empresaTXT, style: 'descripTabla'}],
 						[
 							[
 								{text: 'Registro Federal de Contribuyentes con homoclave (SHCP)\n', style: 'descripTabla'},
@@ -1018,8 +1113,8 @@ function crearDocumento(){
 						[{text: 'aquel que no se conduce con verdad.', style: 'descripTabla4', colSpan: 3, border: [true, false, true, false]}, {}, {}],
 						[
 							{text: 'Instructor o tutor\n\n' + stpsTXT + '\n____________________________________\nNombre y firma\n', style: 'descripTabla2', border: [true, false, false, true], margin: [0 ,8 ,0 , 8]},
-							{text: 'Patrón o representante legal\n\n\n____________________________________\nNombre y firma\n', style: 'descripTabla2', border: [false, false, false, true], margin: [0 ,8 ,0 , 8]},
-							{text: 'Representante de los trabajadores\n\n\n____________________________________\nNombre y firma\n', style: 'descripTabla2', border: [false, false, true, true], margin: [0 ,8 ,0 , 8]}
+							{text: 'Patrón o representante legal\n\n' + patronTXT + '\n____________________________________\nNombre y firma\n', style: 'descripTabla2', border: [false, false, false, true], margin: [0 ,8 ,0 , 8]},
+							{text: 'Representante de los trabajadores\n\n' + representanteTXT + '\n____________________________________\nNombre y firma\n', style: 'descripTabla2', border: [false, false, true, true], margin: [0 ,8 ,0 , 8]}
 						]
 					]
 				}
@@ -1501,6 +1596,10 @@ function crearDocumento(){
 		pdfMake.createPdf(doc).open();
 	}else if(accionPDF === 2){
 		// DESCARGAMOS EL DOC
-		pdfMake.createPdf(doc).download();
+		var nomDoc = "Trabajador_";
+		for(n = 0; n < curpTXT.length; n++){
+			nomDoc += curpTXT[n];
+		}
+		pdfMake.createPdf(doc).download(nomDoc);
 	}
 }

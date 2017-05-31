@@ -5,22 +5,6 @@ $(function(){
 	leerCatalogos();
 });
 
-// QUITAR INVALID CLASS A LOS TEXT (VALIDACION)
-$(document).on('click', '#empresa', function(){
-	$(this).removeClass('has-error');
-});
-$(document).on('click', '#rfc', function(){
-	$(this).removeClass('has-error');
-});
-$(document).on('click', '#patron', function(){
-	$(this).removeClass('has-error');
-});
-$(document).on('click', '#representante', function(){
-	$(this).removeClass('has-error');
-});
-// ::::::::::::::::::::::::::::::::::::::::::::::
-
-
 // CARGADO DE IMAGENES (ALTA DE EMPRESAS)
 $(document).on('change', '#imgfile', function(){
 	if($(this).val !== ''){
@@ -88,7 +72,7 @@ function imageLoaded(){
 
 // CARGADO DE IMAGENES (ALTA DE CURSOS)
 $(document).on('change', '#imgfile2', function(){
-	if($(this).val !== ''){
+	if($(this).val !== '' || $(this).val !== null || $(this).val !== undefined){
 		if (typeof window.FileReader !== 'function') {
 	        sweetAlert("Error", "Esta API no escompatible con su navegador", "error");
 	    }
@@ -117,7 +101,7 @@ $(document).on('change', '#imgfile2', function(){
 	    }else{
 	        file = input.files[0];
 	        fr = new FileReader();
-	        fr.onload = createImage;
+	        fr.onload = createImage2;
 	        fr.readAsDataURL(file);
 	    }
 	}else{
@@ -130,13 +114,13 @@ $(document).on('change', '#imgfile2', function(){
 // FUNCION DE CARGADO DE IMAGENES
 var input, file, fr, img;
 var fotoPDF2 = 'sin-foto';
-function createImage() {
+function createImage2() {
     img = new Image();
-    img.onload = imageLoaded;
+    img.onload = imageLoaded2;
     img.src = fr.result;
 }
 
-function imageLoaded(){
+function imageLoaded2(){
    	var canvas = document.getElementById("canvas2")
    	canvas.width = img.width;
    	canvas.height = img.height;
@@ -167,6 +151,93 @@ function imageLoaded(){
 	pdfMake.createPdf(dd).open();
 }*/
 // :::::::::: LLENADO DEL MODAL :::::::::::::
+
+function cuerpoHTMLFill(){
+	var cont = '<div class="panel panel-primary">'+
+			'<div class="panel-heading">DATOS DEL TRABAJADOR</div>'+
+			'<div class="panel-body">'+
+				'<div class="row">'+
+					'<div class="col-md-7">'+
+						'<div class="input-group">'+
+							'<span class="input-group-btn">'+
+								'<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>'+
+							'</span>'+
+							'<input id="nomEmpleado" type="text" class="form-control" placeholder="Nombre (Anotar apellido paterno, apellido materno y nombre (s))" />'+
+						'</div>'+
+					'</div>'+
+					'<div class="col-md-5">'+
+						'<div class="input-group">'+
+							'<span class="input-group-btn">'+
+								'<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>'+
+							'</span>'+
+							'<input id="curp" type="text" class="form-control" Placeholder="CURP (Clave Unica de Registro de Poblacion)" maxlength="18" />'+
+						'</div>'+
+					'</div>'+
+				'</div><br>'+
+				'<div class="row">'+
+					'<div class="col-md-7">'+
+						'<select id="empleosCat" class="form-control"></select>'+
+					'</div>'+
+					'<div class="col-md-5">'+
+						'<input id="puesto" type="text" class="form-control" Placeholder="Puesto" />'+
+					'</div>'+
+				'</div>'+
+			'</div>'+
+		'</div>'+
+		'<div class="panel panel-warning">'+
+			'<div class="panel-heading">SELECCIONE EMPRESA Y CURSO</div>'+
+			'<div class="panel-body">'+
+				'<div class="row">'+
+					'<div class="col-md-6">'+
+						'<div class="input-group">'+
+							'<span class="input-group-btn">'+
+								'<button id="buscarEmpleadoDoc" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>'+
+							'</span>'+
+							'<input id="selectEmpresa" type="text" class="form-control" placeholder="Nombre de la empresa" readonly="true" />'+
+						'</div>'+
+					'</div>'+
+					'<div class="col-md-6">'+
+						'<select id="selectCurso" class="form-control">'+
+							'<option value="-1">- Seleccione el curso -</option>'+
+						'</select>'+
+					'</div>'+
+				'</div>'+
+			'</div>'+
+		'</div>'+
+		'<div class="panel panel-default">'+
+			'<div class="panel-body">'+
+				'<div class="row">'+
+					'<div class="col-md-4">'+
+						'<button id="visualizarPDF" value="1" class="btn btn-info">'+
+							'<span class="glyphicon glyphicon-print"></span> Visualizar Documento'+
+						'</button>'+
+					'</div>'+
+					'<div class="col-md-4">'+
+						'<button id="descargarPDF" value="2" class="btn btn-primary">'+
+							'<span class="glyphicon glyphicon-save"></span> Descargar Documento'+
+						'</button>'+
+					'</div>'+
+					'<div class="col-md-4">'+
+						'<button id="limpiarTrabajador" value="2" class="btn btn-default">'+
+							'<span class="glyphicon glyphicon-erase"></span>  Limpiar datos de trabajador'+
+						'</button>'+
+					'</div>'+
+				'</div>	'+	
+			'</div>'+
+		'</div>'+
+	'</div>';
+	$('#cuerpo').hide(200);
+	setTimeout(function(){
+		$('#cuerpo').html('');
+		$('#cuerpo').append(cont);
+	}, 450);
+	setTimeout(function(){
+		$('#cuerpo').show(200);
+		$('#barraPrinc').show(200);
+		leerCatalogos();
+	}, 800);
+}
+
 // FUNCION DE LLENAR MODAL PARA EMPRESAS
 function modalEmpresasFill(){
 	var cont = '<div class="panel panel-info">'+
@@ -258,7 +329,7 @@ function modalCursosFill(){
 							'<span class="input-group-btn">'+
 								'<button id="consulEmpresaCurso" value="0" class="btn btn-info" type="button"><span id="iconConculEmpresa" class="glyphicon glyphicon-search"></span></button>'+
 							'</span>'+
-							'<input id="nomEmpresa" type="text" class="form-control" placeholder="Nombre del curso" readonly="true" />'+
+							'<input id="nomEmpresa" type="text" class="form-control" placeholder="Realize una consulta para elegir empresa..." readonly="true" />'+
 						'</div>'+
 						'<div id="consulEmpresaDiv" class="row" hidden>'+
 							'<div class="col-md-12">'+
@@ -282,7 +353,7 @@ function modalCursosFill(){
 								'</div>'+
 							'</div>'+
 							'<div class="col-md-4">'+
-								'<input id="duracion" type="text" class="form-control" placeholder="Duración en horas" />'+
+								'<input id="duracion" type="text" class="form-control" placeholder="Duración en horas" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" />'+
 							'</div>'+
 						'</div><br>'+
 
@@ -346,5 +417,48 @@ function modalCursosFill(){
 
 	$('#modalCapt').modal('show');
 	$('#titModal').text('Alta de Cursos');
+	leerCatalogos();
 	limpiarModalCursos();
+}
+
+function modalBusqEmpresaFill(){
+	var cont = '<div class="panel panel-default"><div class="panel-body">'+
+				'<div class="row">'+
+	    			'<div class="col-md-12">'+
+	    				'<input id="buscarEmpresaDoc" type="text" class="form-control" placeholder="Escriba el nombre de la empresa" />'+
+	    			'</div>'+
+	    		'</div><br>'+
+	    		'<div class="row">'+
+	    			'<div class="col-md-12">'+
+	    				'<br>'+
+	    				'<div class="tablaConsulta2">'+
+	    					'<div id="tablaEmpresasDoc" class="table-responsive"></div>'+
+	    				'</div>'+
+	    			'</div>'+
+	    		'</div>'+
+	    		'</div></div>';
+	$('#modalCuerpo').html('');
+	$('#modalCuerpo').append(cont);
+	$('#tablaEmpresasDoc').html('');
+	$('#buscarEmpresaDoc').val('');
+	$('#titModal').text('Buscar Empresa');
+	$('#modalCapt').modal('show');
+	setTimeout(function(){
+		$('#buscarEmpresaDoc').focus();
+	}, 500);
+}
+
+$(document).on('click', '#loginBTN', function(){
+	login();
+});
+
+function login(){
+	if($('#user').val() === 'admin' && $('#pass').val() === 'admin'){
+		cuerpoHTMLFill();
+	}else{
+		$.alert({
+		    title: 'Error de inicio sesion',
+		    content: 'Usuario y/o contraseña incorrectos',
+		});
+	}
 }
