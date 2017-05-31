@@ -707,6 +707,13 @@ function llenarCatalogoSelect(json){
 
 
 function llenarDataEmpresas(id){
+	var canvas = document.getElementById("img1");
+    var ctx = canvas.getContext("2d");
+    var image = new Image();
+    image.onload = function () {
+    	ctx.drawImage(image, 0, 0);
+	}
+
 	$.ajax({
 		url:'rutas/rutaTrabajador.php',
 		type:'POST',
@@ -724,9 +731,13 @@ function llenarDataEmpresas(id){
 				representanteSAVE = campo.representante;
 				imgEmpSAVE = campo.imagen;
 			});
+
 			setTimeout(function(){
+				image.src = imgEmpSAVE;
+
 				msgMulti('Datos de empresa', '<b>RFC: </b>' + shcpSAVE + '\n<b>Jefe: </b>' + patronSAVE + '\n<b>Representante: </b>' + representanteSAVE, 15000, 'info');
-			}, 400);
+			}, 800);
+
 			//removeSpinner();
 		}
 	});
@@ -759,7 +770,7 @@ function configValsPDF(){
 	//if(imgEmpSAVE === 'sin-foto'){
 		imgTxtEmp = "{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]}";
 	/*}else{
-		imgTxtEmp = "{image: imgEmpSAVE, height: 70, alignment: 'left', border: [false, false, false, false]}";
+		imgTxtEmp = "{image: " + ff + ", height: 70, alignment: 'left', border: [false, false, false, false]}";
 	}*/
 
 	//if(imgCursoSAVE === 'sin-foto'){
@@ -772,7 +783,7 @@ function configValsPDF(){
 
 	setTimeout(function(){
 		crearDocumento();
-	}, 500);
+	}, 1500);
 }
 
 // ::::::::::::: FUNCION CON EL DOCUMENTO :::::::::::

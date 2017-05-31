@@ -65,7 +65,7 @@ function imageLoaded(){
 	   	ctx.drawImage(img,0,0);
 	   	fotoPDF = canvas.toDataURL("image/png");
    	}else{
-   		alert('img muy grande');
+   		msgMulti('Imagen demasiado grande', 'La imagen no debe exceder los <b>500px</b> de alto u ancho', 20000, 'error');
    		$('#imgfile').val('');
    	}
 }
@@ -130,7 +130,7 @@ function imageLoaded2(){
 	   	ctx.drawImage(img,0,0);
 	   	fotoPDF2 = canvas.toDataURL("image/png");
    	}else{
-   		alert('img muy grande');
+   		msgMulti('Imagen demasiado grande', 'La imagen no debe exceder los <b>500px</b> de alto u ancho', 20000, 'error');
    		$('#imgfile2').val('');
    	}
 }
