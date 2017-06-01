@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `cursos` (
 	`inicio` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`final` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`area` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`instructor` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`stps` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`imagen` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`status` varchar(20) COLLATE utf8_bin DEFAULT '1',
@@ -54,6 +55,19 @@ PRIMARY KEY (`id`),
 	KEY `idempresa` (`idempresa`)
 );
 
+-- ::::::::::::::: TABLA DE USERS
+DROP TABLE IF EXISTS `login`;
+CREATE TABLE IF NOT EXISTS `login` (
+	`id` bigint(20) NOT NULL AUTO_INCREMENT,
+	`user` varchar(400) DEFAULT NULL,
+	`pass` varchar(300) COLLATE utf8_bin DEFAULT NULL,
+	`tipo` varchar(300) COLLATE utf8_bin DEFAULT NULL,
+	`status` varchar(20) COLLATE utf8_bin DEFAULT '1',
+PRIMARY KEY (`id`),
+	KEY `user` (`user`)
+);
+
+INSERT INTO login (user, pass, tipo) VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrador');
 
 -- ::::::::::: INSERCION DE VALORES TABLAS EMPLEO Y CURSOS
 INSERT INTO empleo_catalogo (clave,denominacion) VALUES ('01','Cultivo, crianza y aprovechamiento');

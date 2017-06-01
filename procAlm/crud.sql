@@ -115,15 +115,15 @@
 		IN _idEmpresa VARCHAR(500), IN _nomEmpresa VARCHAR(200),
 		IN _curso VARCHAR(500), IN _duracion VARCHAR(500),
 		IN _inicio VARCHAR(500), IN _fin VARCHAR(500),
-		IN _area VARCHAR(500), IN _stps VARCHAR(500), IN _img TEXT
+		IN _area VARCHAR(500), IN _instructor VARCHAR(500), IN _stps VARCHAR(500), IN _img TEXT
 	)
 	BEGIN
-		INSERT INTO cursos (idempresa, nomempresa, curso, duracion, inicio, final, area, stps, imagen)
-			VALUES (_idEmpresa, _nomEmpresa, _curso, _duracion, _inicio, _fin, _area, _stps, _img);
+		INSERT INTO cursos (idempresa, nomempresa, curso, duracion, inicio, final, area, instructor, stps, imagen)
+			VALUES (_idEmpresa, _nomEmpresa, _curso, _duracion, _inicio, _fin, _area, _instructor, _stps, _img);
 	END $$
 	DELIMITER ;
 
-	-- :::::::::: BAJA DE EMPRESA :::::::
+	-- :::::::::: BAJA DE CURSOS :::::::
 	DROP PROCEDURE IF EXISTS SP_BAJACURSO;
 
 	DELIMITER $$
@@ -137,7 +137,7 @@
 	END $$
 	DELIMITER ;
 
-	-- :::::::::: EDICION DE EMPRESA :::::::
+	-- :::::::::: EDICION DE CURSOS :::::::
 	DROP PROCEDURE IF EXISTS SP_EDITARCURSO;
 
 	DELIMITER $$
@@ -147,7 +147,7 @@
 		IN _idEmpresa VARCHAR(500), IN _nomEmpresa VARCHAR(200),
 		IN _curso VARCHAR(500), IN _duracion VARCHAR(500),
 		IN _inicio VARCHAR(500), IN _fin VARCHAR(500),
-		IN _area VARCHAR(500), IN _stps VARCHAR(500), IN _img TEXT
+		IN _area VARCHAR(500), IN _instructor VARCHAR(500),IN _stps VARCHAR(500), IN _img TEXT
 	)
 	BEGIN
 		IF _img = 'noeditar' THEN
@@ -159,6 +159,7 @@
 				inicio = _inicio, 
 				final = _fin, 
 				area = _area,
+				instructor = _instructor,
 				stps = _stps
 			WHERE id = _id;
 		ELSE
@@ -170,6 +171,7 @@
 				inicio = _inicio, 
 				final = _fin, 
 				area = _area,
+				instructor = _instructor,
 				stps = _stps, 
 				imagen = _img
 			WHERE id = _id;
@@ -202,7 +204,7 @@
 		IN _id INT
 	)
 	BEGIN
-		SELECT idempresa, nomempresa, curso, duracion, inicio, final, area, stps FROM cursos WHERE id = _id;
+		SELECT idempresa, nomempresa, curso, duracion, inicio, final, area, instructor, stps FROM cursos WHERE id = _id;
 	END $$
 	DELIMITER ;
 
@@ -243,5 +245,19 @@
 	)
 	BEGIN
 		SELECT * FROM cursos WHERE id = _id;
+	END $$
+	DELIMITER ;
+
+-- :::::::::::: FUNCIONES PARA TRABAJADORES ::::::::::::
+	-- ::::::::::: FUNCIONES DE USUARIOS
+	DROP PROCEDURE IF EXISTS SP_GETLOGIN;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_GETLOGIN(
+		IN _user VARCHAR(500), IN _pass VARCHAR(500)
+	)
+	BEGIN
+		SELECT COUNT(*) C FROM login WHERE user = _user AND pass = _pass;
 	END $$
 	DELIMITER ;

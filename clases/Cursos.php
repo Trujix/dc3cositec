@@ -10,11 +10,12 @@
 			$inicio = $info["inicio"];
 			$fin = $info["fin"];
 			$area = $info["area"];
+			$instructor = $info["instructor"];
 			$stps = $info["stps"];
 			$imagen = $info["imagen"];
 
 			$guardarCurso = "CALL SP_ALTACURSO(
-					'$idEmpresa' ,'$nomEmpresa' ,'$curso' ,'$duracion' ,'$inicio','$fin' ,'$area' ,'$stps', '$imagen'
+					'$idEmpresa' ,'$nomEmpresa' ,'$curso' ,'$duracion' ,'$inicio','$fin' ,'$area' ,'$instructor' ,'$stps', '$imagen'
 				)";
 			if($this->query($guardarCurso)){
 				return "TRUE";
@@ -37,11 +38,12 @@
 			$inicio = $info["inicio"];
 			$fin = $info["fin"];
 			$area = $info["area"];
+			$instructor = $info["instructor"];
 			$stps = $info["stps"];
 			$imagen = $info["imagen"];
 
 			$editarCurso = "CALL SP_EDITARCURSO(
-					'$idcurso' ,'$idEmpresa' ,'$nomEmpresa' ,'$curso' ,'$duracion' ,'$inicio','$fin' ,'$area' ,'$stps', '$imagen'
+					'$idcurso' ,'$idEmpresa' ,'$nomEmpresa' ,'$curso' ,'$duracion' ,'$inicio','$fin' ,'$area', '$instructor' ,'$stps', '$imagen'
 				)";
 			if($this->query($editarCurso)){
 				return "TRUE";

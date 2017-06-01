@@ -3,7 +3,13 @@
 $(function(){
 	// TRAER LOS CATALOGOS
 	leerCatalogos();
-	cuerpoHTMLFill();
+	var param1 = leerCookie('alterego');
+	var param2 = leerCookie('key');
+	if(param1 !== undefined && param2 !== undefined){
+		login(param1, param2, 'cookieRead');
+	}else{
+		loginHTMLFill();
+	}
 });
 
 // CARGADO DE IMAGENES (ALTA DE EMPRESAS)
@@ -152,8 +158,46 @@ function imageLoaded2(){
 	pdfMake.createPdf(dd).open();
 }*/
 // :::::::::: LLENADO DEL MODAL :::::::::::::
+function loginHTMLFill(){
+	var cont = '<div class="form-signin">'+
+        '<h2 class="form-signin-heading">Iniciar Sesion</h2>'+
+        '<label for="inputEmail" class="sr-only">Usuario</label>'+
+        '<input type="text" id="user" class="form-control" placeholder="Uusario" required autofocus>'+
+        '<label for="inputPassword" class="sr-only">Contraseña</label>'+
+        '<input type="password" id="pass" class="form-control" placeholder="Contraseña" required>'+
+        '<div class="checkbox">'+
+        '</div>'+
+        '<button id="loginBTN" class="btn btn-lg btn-primary btn-block">Iniciar Sesion</button>'+
+      '</div>';
+    setTimeout(function(){
+		$('#cuerpo').html('');
+		$('#cuerpo').append(cont);
+	}, 450);
+	setTimeout(function(){
+		$('#cuerpo').show(200);
+		$('#barraPrinc').show(200);
+		leerCatalogos();
+	}, 800);
+}
 
 function cuerpoHTMLFill(){
+	var barra = '<div class="container">'+
+        '<div class="navbar-header">'+
+          '<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">'+
+            '<span class="sr-only">Toggle navigation</span>'+
+            '<span class="icon-bar"></span>'+
+            '<span class="icon-bar"></span>'+
+            '<span class="icon-bar"></span>'+
+          '</button>'+
+          '<a class="navbar-brand" href="#">Formato DC-3</a>'+
+        '</div>'+
+        '<div id="navbar" class="navbar-collapse collapse">'+
+          '<ul class="nav navbar-nav">'+
+            '<li><a id="altaEmpresas" role="button">Empresas</a></li>'+
+            '<li><a id="altaCursos" role="button">Cursos</a></li>'+
+          '</ul>'+
+        '</div>'+
+      '</div>';
 	var cont = '<div class="panel panel-primary">'+
 			'<div class="panel-heading">DATOS DEL TRABAJADOR</div>'+
 			'<div class="panel-body">'+
@@ -190,12 +234,7 @@ function cuerpoHTMLFill(){
 			'<div class="panel-body">'+
 				'<div class="row">'+
 					'<div class="col-md-6">'+
-						'<div class="input-group">'+
-							'<span class="input-group-btn">'+
-								'<button id="buscarEmpleadoDoc" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>'+
-							'</span>'+
-							'<input id="selectEmpresa" type="text" class="form-control" placeholder="Nombre de la empresa" readonly="true" />'+
-						'</div>'+
+						'<input id="selectEmpresa" type="text" class="form-control" placeholder="Nombre de la empresa" />'+
 					'</div>'+
 					'<div class="col-md-6">'+
 						'<select id="selectCurso" class="form-control">'+
@@ -231,6 +270,9 @@ function cuerpoHTMLFill(){
 	setTimeout(function(){
 		$('#cuerpo').html('');
 		$('#cuerpo').append(cont);
+		$('#barraPrinc').html('');
+		$('#barraPrinc').addClass('navbar navbar-inverse navbar-fixed-top');
+		$('#barraPrinc').append(barra);
 	}, 450);
 	setTimeout(function(){
 		$('#cuerpo').show(200);
@@ -272,31 +314,6 @@ function modalEmpresasFill(){
 							'</div>'+
 						'</div>'+
 
-						'<div class="row">'+
-							'<div class="col-md-12">'+
-								'<button id="consulEmpresa" value="0" class="btn btn-info"><span id="iconConsulEmpresa" class="glyphicon glyphicon-search"></span></button>'+
-							'</div>'+
-						'</div><br>'+
-
-						'<div id="consultaEmpresa" class="row" hidden>'+
-							'<div class="col-md-12">'+
-								'<div class="row">'+
-									'<div class="col-md-9">'+
-										'<input id="buscarEmpresa" type="text" class="form-control" placeholder="Esciba el nombre de la empresa...">'+
-									'</div>'+
-									'<div class="col-md-3"><p></p></div>'+
-								'</div><br>'+
-								'<div class="row">'+
-									'<div class="col-md-12">'+
-										'<div class="tablaConsulta">'+
-											'<div id="tablaEmpresa" class="table-responsive"></div>'+
-										'</div>'+
-									'</div>'+
-								'</div>'+
-							'</div>'+
-								
-						'</div>'+
-
 					'</div>'+
 				'</div>'+
 
@@ -326,18 +343,7 @@ function modalEmpresasFill(){
 function modalCursosFill(){
 	var cont = '<div class="panel panel-default">'+
 	    			'<div class="panel-body">'+
-	    				'<div class="input-group">'+
-							'<span class="input-group-btn">'+
-								'<button id="consulEmpresaCurso" value="0" class="btn btn-info" type="button"><span id="iconConculEmpresa" class="glyphicon glyphicon-search"></span></button>'+
-							'</span>'+
-							'<input id="nomEmpresa" type="text" class="form-control" placeholder="Realize una consulta para elegir empresa..." readonly="true" />'+
-						'</div>'+
-						'<div id="consulEmpresaDiv" class="row" hidden>'+
-							'<div class="col-md-12">'+
-								'<br>'+
-								'<div id="tablaEmpresaCurso" class="tablaConsulta"></div>'+
-							'</div>'+
-						'</div>'+
+						'<input id="nomEmpresa" type="text" class="form-control" placeholder="Realize una consulta para elegir empresa..." />'+
 	    			'</div>'+
 	    		'</div>'+
 	    		'<div class="panel panel-success">'+
@@ -346,12 +352,7 @@ function modalCursosFill(){
 
 						'<div class="row">'+
 							'<div class="col-md-8">'+
-								'<div class="input-group">'+
-									'<span class="input-group-btn">'+
-										'<button id="consulCurso" class="btn btn-info" value="0" type="button"><span id="iconConculCurso" class="glyphicon glyphicon-search"></span></button>'+
-									'</span>'+
-									'<input id="nomCurso" type="text" class="form-control" placeholder="Nombre del curso" />'+
-								'</div>'+
+								'<input id="nomCurso" type="text" class="form-control" placeholder="Nombre del curso" />'+
 							'</div>'+
 							'<div class="col-md-4">'+
 								'<input id="duracion" type="text" class="form-control" placeholder="Duración en horas" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" />'+
@@ -372,12 +373,14 @@ function modalCursosFill(){
 								'<input id="fechaFin" type="date" class="form-control" />'+
 							'</div>'+
 						'</div><br>'+
-
 						'<div class="row">'+
-							'<div class="col-md-6">'+
+							'<div class="col-md-4">'+
 								'<select id="cursosCat" class="form-control"></select>'+
 							'</div>'+
-							'<div class="col-md-6">'+
+							'<div class="col-md-3">'+
+								'<input id="instructor" type="text" class="form-control" Placeholder="Instructor o tutor..." />'+
+							'</div>'+
+							'<div class="col-md-5">'+
 								'<input id="capacitador" type="text" class="form-control" Placeholder="Nombre del agente capacitador o STPS" />'+
 							'</div>'+
 						'</div><br>'+
@@ -450,16 +453,51 @@ function modalBusqEmpresaFill(){
 }
 
 $(document).on('click', '#loginBTN', function(){
-	login();
+	var us = $("#user").val();
+	var pas = $("#pass").val();
+	login(us, pas, 'loginForm');
 });
 
-function login(){
-	if($('#user').val() === 'admin' && $('#pass').val() === 'admin'){
-		cuerpoHTMLFill();
-	}else{
-		$.alert({
-		    title: 'Error de inicio sesion',
-		    content: 'Usuario y/o contraseña incorrectos',
-		});
-	}
+// FUNCIONES DE SEGURIDAD
+function login(user, clave, origen){
+	var userData = {
+		usuario: user,
+		password: clave,
+		status: origen
+	};
+	$.ajax({
+		url:'rutas/rutaUsuarios.php',
+		type:'POST',
+		data: {info: userData, action: 'login'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			if(data === 'TRUE'){
+				cuerpoHTMLFill();
+				if(origen === 'loginForm'){
+					document.cookie = "alterego=" + $('#user').val() + ";path=/";
+					document.cookie = "key=" + md5(pass.value) + ";path=/";
+				}
+			}else if(data === 'FALSE'){
+				if(origen === 'loginForm'){
+					$.alert({
+					    title: 'Error de inicio sesion',
+					    content: 'Usuario y/o contraseña incorrectos',
+					});
+				}else{
+					loginHTMLFill();
+					document.cookie = "alterego=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+					document.cookie = "key=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+				}
+			}
+		}
+	});
+}
+function leerCookie(nombre){
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + nombre + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
 }
