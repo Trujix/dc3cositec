@@ -209,6 +209,22 @@
 	DELIMITER ;
 
 -- :::::::::::: FUNCIONES PARA TRABAJADORES ::::::::::::
+	-- :::::::::: ALTA DE TRABAJADOR :::::::
+	DROP PROCEDURE IF EXISTS SP_ALTATRABAJADOR;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_ALTATRABAJADOR(
+		IN _nombre VARCHAR(500), IN _curp VARCHAR(200),
+		IN _ocupacion VARCHAR(500), IN _puesto VARCHAR(500),
+		IN _nomEmpresa VARCHAR(500), IN _idEmpresa INT
+	)
+	BEGIN
+		INSERT INTO trabajadores (nombre, curp, ocupacion, puesto, empresa, idempresa)
+			VALUES (_nombre, _curp, _ocupacion, _puesto, _nomEmpresa, _idEmpresa);
+	END $$
+	DELIMITER ;
+	
 	-- :::::::::: BUSQUEDA CURSOS POR ID EMPRESA :::::::
 	DROP PROCEDURE IF EXISTS SP_GETCURSOEMPRESA;
 
@@ -248,7 +264,7 @@
 	END $$
 	DELIMITER ;
 
--- :::::::::::: FUNCIONES PARA TRABAJADORES ::::::::::::
+-- :::::::::::: FUNCIONES PARA USUARIOS ::::::::::::
 	-- ::::::::::: FUNCIONES DE USUARIOS
 	DROP PROCEDURE IF EXISTS SP_GETLOGIN;
 

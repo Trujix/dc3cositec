@@ -611,6 +611,32 @@ function consultCurso(nombre, idInput){
 		});
 	}
 }
+
+// FUNCIONES CON TRABAJADORES
+function altaTrabajador(){
+	var dataTrabajador = {
+		nombre: $('#nomEmpleado').val(),
+		curp: $('#curp').val(),
+		ocupacion: $('#empleosCat option:selected').text(),
+		puesto: $('#puesto').val(),
+		nomEmpresa: $('#selectEmpresa').val(),
+		idEmpresa: idEmpresaDoc
+	};
+	$.ajax({
+		url:'rutas/rutaTrabajador.php',
+		type:'POST',
+		data: {info: dataTrabajador, action: 'altaTrabajador'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			// FIN
+		}
+	});
+}
+
 // ************************************************
 // :::::::::::: FIN FUNCONES BASES DE DATOS :::::::
 // ************************************************
@@ -648,7 +674,9 @@ $(document).on('keyup', '#buscarEmpresaDoc', function(){
 });
 
 // FUNCION TRAER CURSOS
+var idEmpresaDoc;
 function selecEmpresaDoc(id){
+	idEmpresaDoc = id;
 	$('#selectEmpresa').val($('#nomEmp_' + id).text());
 	$('#selectCurso').html('');
 	$.ajax({
@@ -1692,13 +1720,56 @@ function crearDocumento(){
 	if(accionPDF === 1){
 		// ABRIMOS EL DOC
 		pdfMake.createPdf(doc).open();
+		altaTrabajador();
 	}else if(accionPDF === 2){
 		// DESCARGAMOS EL DOC
-		var nomDoc = "Trabajador_";
-		for(n = 0; n < curpTXT.length; n++){
-			nomDoc += curpTXT[n];
-		}
-		pdfMake.createPdf(doc).download(nomDoc);
+
+		var nomDoc;
+		$.confirm({
+		    title: 'Agregar Nombre',
+		    content: '' +
+		    '<form action="" class="formName">' +
+		    '<div class="form-group">' +
+		    '<label>Escriba el nombre del archivo...</label>' +
+		    '<input type="text" placeholder="Your name" class="name form-control" required />' +
+		    '</div>' +
+		    '</form>',
+		    buttons: {
+		        nombre: {
+		            text: 'Asignar nombre',
+		            btnClass: 'btn-blue',
+		            action: function () {
+		                var name = this.$content.find('.name').val();
+		                if(!name){
+		                    $.alert('Coloque un nombre...');
+		                    return false;
+		                }
+		                nomDoc = name;
+		                pdfMake.createPdf(doc).download(nomDoc);
+		                altaTrabajador();
+		            }
+		        },
+		        defecto: {
+		            text: 'Nombre por defecto',
+		            btnClass: 'btn-warning',
+		            action: function () {
+		            	nomDoc = 'Trabajador_';
+		                for(n = 0; n < curpTXT.length; n++){
+							nomDoc += curpTXT[n];
+						}
+						pdfMake.createPdf(doc).download(nomDoc);
+						altaTrabajador();
+		            }
+		        },
+		        cancelar: {
+		            text: 'Cancelar',
+		            btnClass: 'btn-danger',
+		            action: function () {
+		            	habilBtnDoc();
+		            }
+		        },
+		    },
+		});
 	}
 }
 // CODIGO SUELTO (POR SI LO NECESITO)

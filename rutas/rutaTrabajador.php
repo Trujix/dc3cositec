@@ -12,6 +12,9 @@
 		$info = $_POST['info'];
 
 	switch ($action) {
+		case 'altaTrabajador':
+			echo json_encode($Trabajador->altaTrabajador($info));
+			break;
 		case 'traerCursoEmpresa':
 			echo json_encode($Trabajador->traerCursoEmpresa($info));
 			break;

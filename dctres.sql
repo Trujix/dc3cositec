@@ -60,11 +60,11 @@ DROP TABLE IF EXISTS `trabajadores`;
 CREATE TABLE IF NOT EXISTS `trabajadores` (
 	`id` bigint(20) NOT NULL AUTO_INCREMENT,
 	`nombre` varchar(400) COLLATE utf8_bin DEFAULT NULL,
-	`curp` varchar(300) COLLATE utf8_bin DEFAULT NULL,
+	`curp` varchar(100) COLLATE utf8_bin DEFAULT NULL,
 	`ocupacion` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`puesto` varchar(500) COLLATE utf8_bin DEFAULT NULL,
-	`idempresa` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`empresa` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`idempresa` varchar(500) COLLATE utf8_bin DEFAULT NULL,
 	`status` varchar(20) COLLATE utf8_bin DEFAULT '1',
 PRIMARY KEY (`id`),
 	KEY `curp` (`curp`)

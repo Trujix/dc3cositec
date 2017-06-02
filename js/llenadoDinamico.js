@@ -203,20 +203,10 @@ function cuerpoHTMLFill(){
 			'<div class="panel-body">'+
 				'<div class="row">'+
 					'<div class="col-md-7">'+
-						'<div class="input-group">'+
-							'<span class="input-group-btn">'+
-								'<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>'+
-							'</span>'+
-							'<input id="nomEmpleado" type="text" class="form-control" placeholder="Nombre (Anotar apellido paterno, apellido materno y nombre (s))" />'+
-						'</div>'+
+						'<input id="nomEmpleado" type="text" class="form-control" placeholder="Nombre (Anotar apellido paterno, apellido materno y nombre (s))" />'+
 					'</div>'+
 					'<div class="col-md-5">'+
-						'<div class="input-group">'+
-							'<span class="input-group-btn">'+
-								'<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>'+
-							'</span>'+
-							'<input id="curp" type="text" class="form-control" Placeholder="CURP (Clave Unica de Registro de Poblacion)" maxlength="18" />'+
-						'</div>'+
+						'<input id="curp" style="text-transform: uppercase" type="text" class="form-control" Placeholder="CURP (Clave Unica de Registro de Poblacion)" maxlength="18" />'+
 					'</div>'+
 				'</div><br>'+
 				'<div class="row">'+
@@ -295,7 +285,7 @@ function modalEmpresasFill(){
 
 						'<div class="row">'+
 							'<div class="col-md-4">'+
-								'<input id="rfc" type="text" class="form-control" Placeholder="RFC de la empresa" maxlength="13" />'+
+								'<input id="rfc" type="text" style="text-transform: uppercase" class="form-control" Placeholder="RFC de la empresa" maxlength="13" />'+
 							'</div>'+
 							'<div class="col-md-4">'+
 								'<input id="patron" type="text" class="form-control" Placeholder="Patrón o representante Legal" />'+
