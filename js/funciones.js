@@ -614,9 +614,17 @@ function consultCurso(nombre, idInput){
 
 // FUNCIONES CON TRABAJADORES
 function altaTrabajador(){
+	var accionTrab;
+	if(idTrabajador === ''){
+		accionTrab = 'altaTrabajador';
+	}else{
+		accionTrab = 'editarTrabajador';
+	}
+
 	var dataTrabajador = {
+		id: idTrabajador,
 		nombre: $('#nomEmpleado').val(),
-		curp: $('#curp').val(),
+		curp: $('#curp').val().toUpperCase(),
 		ocupacion: $('#empleosCat option:selected').text(),
 		puesto: $('#puesto').val(),
 		nomEmpresa: $('#selectEmpresa').val(),
@@ -625,18 +633,112 @@ function altaTrabajador(){
 	$.ajax({
 		url:'rutas/rutaTrabajador.php',
 		type:'POST',
-		data: {info: dataTrabajador, action: 'altaTrabajador'},
+		data: {info: dataTrabajador, action: accionTrab},
 		dataType:'JSON',
 		error: function(error){
 			console.log(error);
 			//removeSpinner();
 		},
 		success: function(data){
+			idTrabajador = '';
 			// FIN
 		}
 	});
 }
+// FUNCION DE BORRADO DE TRABAJADOR
+function borrarTrabajador(idTrab){
+	$.confirm({
+	    title: 'Eliminar trabajador',
+	    content: '¿Decea eliminar este trabajador?',
+	    buttons: {
+	        guardar: {
+	            text: 'Eliminar',
+	            btnClass: 'btn-danger',
+	            action: function(){
+	               $.ajax({
+						url:'rutas/rutaTrabajador.php',
+						type:'POST',
+						data: {info: idTrab, action: 'bajaTrabajador'},
+						dataType:'JSON',
+						error: function(error){
+							console.log(error);
+							//removeSpinner();
+						},
+						success: function(data){
+							//removeSpinner();
+							limpiarTrabajador();
+							msgMulti('Exito', 'Trabajador eliminado con exito', 6000, 'success');
+						}
+					});
+	            }
+	        },
+	        noguardar: {
+	            text: 'Cancelar',
+	            btnClass: 'btn-default',
+	            action: function(){}
+	        }
+	    }
+	});
+}
 
+// FUNCION CONSULTA TRABAJADOR
+$(document).on('keyup', '#nomEmpleado', function(e){
+	busqTrabajador($(this).val(), 'nomEmpleado', 'consulTrabajadorNombre');
+	if(e.keyCode === 27){
+		borrarTrabajador(idTrabajador);
+	}
+});
+
+$(document).on('keyup', '#curp', function(e){
+	busqTrabajador($(this).val(), 'curp', 'consulTrabajadorCurp');
+	if(e.keyCode === 27){
+		borrarTrabajador(idTrabajador);
+	}
+});
+
+var idTrabajador = '';
+function busqTrabajador(trabData, idInput, tipoBusq){
+	var trabajador = [];
+	if(trabData !== ''){
+		$.ajax({
+			url:'rutas/rutaTrabajador.php',
+			type:'POST',
+			data: {info: trabData, action: tipoBusq},
+			dataType:'JSON',
+			error: function(error){
+				console.log(error);
+				//removeSpinner();
+			},
+			success: function(data){
+				$.each(data, function (i, campo){
+					if(tipoBusq === 'consulTrabajadorNombre'){
+							trabajador.push({label: campo.nombre, value: campo.nombre, curp: campo.curp, idt: campo.id, emp: campo.idempresa, nomemp: campo.empresa, ocup: campo.ocupacion, pues: campo.puesto});
+					}else if(tipoBusq === 'consulTrabajadorCurp'){
+							trabajador.push({label: campo.curp, value: campo.curp, nombre: campo.nombre, idt: campo.id, emp: campo.idempresa, nomemp: campo.empresa, ocup: campo.ocupacion, pues: campo.puesto});
+					}
+				});
+				$('#'+idInput).autocomplete({
+					source: function(request, response) {
+			            response(trabajador);
+			        },
+					select: function(event, ui){
+						idTrabajador = ui.item.idt;
+						console.log(ui)
+						$("#empleosCat option[value='"+ui.item.ocup.split(' - ')[0]+"']").prop('selected',true);
+						$('#puesto').val(ui.item.pues);
+						if(tipoBusq === 'consulTrabajadorNombre'){
+							$('#curp').val(ui.item.curp);
+						}else if(tipoBusq === 'consulTrabajadorCurp'){
+							$('#nombre').val(ui.item.nombre);
+						}
+						selecEmpresaDoc(ui.item.emp);
+						$('#selectEmpresa').val(ui.item.nomemp);
+					}
+				});
+			}
+		});
+	}
+}
 // ************************************************
 // :::::::::::: FIN FUNCONES BASES DE DATOS :::::::
 // ************************************************
@@ -781,6 +883,9 @@ function limpiarTrabajador(){
 	$('#nomEmpleado').val('');
 	$('#curp').val('');
 	$('#puesto').val('');
+	idTrabajador = '';
+
+	$('#nomEmpleado').focus();
 }
 
 // *****************************************
@@ -917,7 +1022,7 @@ function valsFormulario(){
 		nombreTXT = $('#nomEmpleado').val();
 
 		curpTXT = $('#curp').val();
-		curpTXT = curpTXT.split('');
+		curpTXT = curpTXT.toUpperCase().split('');
 		if(curpTXT.length < 18){
 			var curpNum = 18 - curpTXT.length;
 			for(c = 0; c < curpNum; c++){

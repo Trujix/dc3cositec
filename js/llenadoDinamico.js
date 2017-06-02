@@ -249,7 +249,7 @@ function cuerpoHTMLFill(){
 					'</div>'+
 					'<div class="col-md-4">'+
 						'<button id="limpiarTrabajador" value="2" class="btn btn-default">'+
-							'<span class="glyphicon glyphicon-erase"></span>  Limpiar datos de trabajador'+
+							'<span class="glyphicon glyphicon-erase"></span>  Limpiar datos de trabajador y cancelar edicion'+
 						'</button>'+
 					'</div>'+
 				'</div>	'+	

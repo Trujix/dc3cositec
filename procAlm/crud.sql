@@ -224,7 +224,65 @@
 			VALUES (_nombre, _curp, _ocupacion, _puesto, _nomEmpresa, _idEmpresa);
 	END $$
 	DELIMITER ;
-	
+
+	-- :::::::::: EDICION DE TRABAJADOR :::::::
+	DROP PROCEDURE IF EXISTS SP_EDITARTRABAJADOR;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_EDITARTRABAJADOR(
+		IN _id INT,
+		IN _nombre VARCHAR(500), IN _curp VARCHAR(200),
+		IN _ocupacion VARCHAR(500), IN _puesto VARCHAR(500),
+		IN _empresa VARCHAR(500), IN _idempresa VARCHAR(500)
+	)
+	BEGIN
+		UPDATE trabajadores SET
+			nombre = _nombre, 
+			curp = _curp, 
+			ocupacion = _ocupacion, 
+			puesto = _puesto, 
+			empresa = _empresa, 
+			idempresa = _idempresa
+		WHERE id = _id;
+		
+	END $$
+	DELIMITER ;
+
+	-- :::::::::: BAJA DE TRABAJADOR :::::::
+	DROP PROCEDURE IF EXISTS SP_BAJATRABAJADOR;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_BAJATRABAJADOR(
+		IN _id INT
+	)
+	BEGIN
+		UPDATE trabajadores SET status = 0
+			WHERE id = _id;
+	END $$
+	DELIMITER ;
+
+	-- :::::::::: BUSCAR TRABAJADOR :::::::
+	DROP PROCEDURE IF EXISTS SP_BUSCARTRABAJADOR;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_BUSCARTRABAJADOR(
+		IN _dataTrab VARCHAR(500), IN _campo VARCHAR(500)
+	)
+	BEGIN
+		IF _campo = 'curp' THEN
+			SELECT * FROM trabajadores
+				WHERE status = 1 AND UPPER(curp) LIKE UPPER(CONCAT(_dataTrab, '%'));
+		ELSE
+			SELECT * FROM trabajadores
+				WHERE status = 1 AND UPPER(nombre) LIKE UPPER(CONCAT(_dataTrab, '%'));
+		END IF;
+
+	END $$
+	DELIMITER ;
+
 	-- :::::::::: BUSQUEDA CURSOS POR ID EMPRESA :::::::
 	DROP PROCEDURE IF EXISTS SP_GETCURSOEMPRESA;
 

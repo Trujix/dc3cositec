@@ -15,6 +15,18 @@
 		case 'altaTrabajador':
 			echo json_encode($Trabajador->altaTrabajador($info));
 			break;
+		case 'editarTrabajador':
+			echo json_encode($Trabajador->editarTrabajador($info));
+			break;
+		case 'bajaTrabajador':
+			echo json_encode($Trabajador->bajaTrabajador($info));
+			break;
+		case 'consulTrabajadorCurp':
+			echo json_encode($Trabajador->consulTrabajadorCurp($info));
+			break;
+		case 'consulTrabajadorNombre':
+			echo json_encode($Trabajador->consulTrabajadorNombre($info));
+			break;
 		case 'traerCursoEmpresa':
 			echo json_encode($Trabajador->traerCursoEmpresa($info));
 			break;
