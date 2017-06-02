@@ -21,6 +21,15 @@
 		case 'bajaTrabajador':
 			echo json_encode($Trabajador->bajaTrabajador($info));
 			break;
+		case 'altaDocCompleto':
+			echo json_encode($Trabajador->altaDocCompleto($info));
+			break;
+		case 'buscarDoc':
+			echo json_encode($Trabajador->buscarDoc($info));
+			break;
+		case 'traerDoc':
+			echo json_encode($Trabajador->traerDoc($info));
+			break;
 		case 'consulTrabajadorCurp':
 			echo json_encode($Trabajador->consulTrabajadorCurp($info));
 			break;

@@ -44,6 +44,48 @@
 			return $this->query($bajaTrabajador);
 		}
 
+		public function altaDocCompleto($info){
+			$nombre = $info["nombre"];
+			$curp = $info["curp"];
+			$ocupacion = $info["ocupacion"];
+			$puesto = $info["puesto"];
+			$empresa = $info["empresa"];
+			$shcp = $info["shcp"];
+			$curso = $info["curso"];
+			$duracion = $info["duracion"];
+			$init = $info["init"];
+			$fin = $info["fin"];
+			$clvcurso = $info["clvcurso"];
+			$instructor = $info["instructor"];
+			$stps = $info["stps"];
+			$patron = $info["patron"];
+			$representante = $info["representante"];
+			$imgEmp = $info["imgEmp"];
+			$imgCurso = $info["imgCurso"];
+			$fecha = $info["fecha"];
+
+			$altaDoc = "CALL SP_ALTADOCUMENTO(
+					'$nombre' ,'$curp' ,'$ocupacion' ,'$puesto' ,'$empresa' ,'$shcp', '$curso',
+					'$duracion' ,'$init' ,'$fin' ,'$clvcurso' ,'$instructor' ,'$stps', '$patron',
+					'$representante' ,'$imgEmp' ,'$imgCurso','$fecha'
+				)";
+			if($this->query($altaDoc)){
+				return "TRUE";
+			}else{
+				return $altaDoc;
+			}
+		}
+
+		public function buscarDoc($info){
+			$buscarDoc = "CALL SP_BUSCARDOCS('$info')";
+			return $this->query_assoc($buscarDoc);
+		}
+
+		public function traerDoc($info){
+			$traerDoc = "CALL SP_TRAEDOC('$info')";
+			return $this->query_assoc($traerDoc);
+		}
+
 		public function traerCursoEmpresa($info){
 			$traerCursoEmp = "CALL SP_GETCURSOEMPRESA('$info')";
 			return $this->query_assoc($traerCursoEmp);

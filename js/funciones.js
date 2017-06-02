@@ -5,11 +5,13 @@ var cursoNuevo = true;
 
 var accionPDF = 0;
 $(document).on("click", "#visualizarPDF" ,function(){
+	reeimpresion = false;
 	accionPDF = parseInt($(this).val());
 	valsFormulario();
 });
 
 $(document).on("click", "#descargarPDF", function(){
+	reeimpresion = false;
 	accionPDF = parseInt($(this).val());
 	valsFormulario();
 });
@@ -47,7 +49,10 @@ $(document).on('click', '#altaEmpresas', function(){
 	tituloEmpresaAccion = "Nueva empresa";
 	descEmpresaAccion = "¿Decea guardar esta empresa?";
 });
-
+// ABRIR MODAL (REIMPIRIMIR)
+$(document).on('click', '#reimprimir', function(){
+	modalDocsBusquedaFill();
+});
 // CERRAR MODAL
 $(document).on('click', "button[name='cerrModal']", function(){
 	$('#modalCapt').modal('hide');
@@ -640,7 +645,7 @@ function altaTrabajador(){
 			//removeSpinner();
 		},
 		success: function(data){
-			idTrabajador = '';
+			limpiarTrabajador();
 			// FIN
 		}
 	});
@@ -723,7 +728,6 @@ function busqTrabajador(trabData, idInput, tipoBusq){
 			        },
 					select: function(event, ui){
 						idTrabajador = ui.item.idt;
-						console.log(ui)
 						$("#empleosCat option[value='"+ui.item.ocup.split(' - ')[0]+"']").prop('selected',true);
 						$('#puesto').val(ui.item.pues);
 						if(tipoBusq === 'consulTrabajadorNombre'){
@@ -739,6 +743,139 @@ function busqTrabajador(trabData, idInput, tipoBusq){
 		});
 	}
 }
+// FUNCION GUARDAR DOCUMENTO COMPLETO
+function altaDocCompleto(){
+	fechaHoraFunc();
+	var docData = {
+		nombre : nombreSAVE,
+		curp : curpSAVE,
+		ocupacion : ocupacionSAVE,
+		puesto : puestoSAVE,
+		empresa : empresaSAVE,
+		shcp : shcpSAVE.toUpperCase(),
+		curso : cursoSAVE,
+		duracion : duracionSAVE,
+		init : initSAVE,
+		fin : finSAVE,
+		clvcurso : clvcursoSAVE,
+		instructor : instructorSAVE,
+		stps : stpsSAVE,
+		patron : patronSAVE,
+		representante : representanteSAVE,
+		imgEmp : imgEmpSAVE,
+		imgCurso : imgCursoSAVE,
+		fecha: fechaHora              
+	};
+	$.ajax({
+		url:'rutas/rutaTrabajador.php',
+		type:'POST',
+		data: {info: docData, action: 'altaDocCompleto'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+			//removeSpinner();
+		},
+		success: function(data){
+			//removeSpinner();
+		}
+	});
+}
+
+$(document).on('keyup', '#buscarTrabajador', function(){
+	$('#tablaDocs').html('');
+	if($(this).val() !== ''){
+		$.ajax({
+			url:'rutas/rutaTrabajador.php',
+			type:'POST',
+			data: {info: $(this).val(), action: 'buscarDoc'},
+			dataType:'JSON',
+			error: function(error){
+				console.log(error);
+				//removeSpinner();
+			},
+			success: function(data){
+				//removeSpinner();
+				var tabla = "<table class='table'><thead><tr><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-file'></span><th>Trabajador</th><th>Empresa</th><th>Curso</th><th>Emisión</th></tr></thead><tbody>";
+				$.each(data, function (i, campo){
+					fechaHoraFormatear(campo.fecha);
+						tabla += '<tr><td><button class="btn btn-xs btn-success" onclick="reimprimirDoc(1,' + campo.id + ')"><span class="glyphicon glyphicon-print" title="Imprimir PDF"></span></button>&nbsp;&nbsp;<button class="btn btn-xs btn-primary" title="Descargar PDF" onclick="reimprimirDoc(2,' + campo.id + ')"><span class="glyphicon glyphicon-save"></span></button></td>' + 
+								'<td>' + campo.nombre + '</td>' +
+								'<td>' + campo.empresa + '</td>' +
+								'<td>' + campo.curso + '</td>' +
+								'<td>' + fechaHoraFormato + '</td></tr>';
+				});
+				tabla += '</tbody></table>';
+				$('#tablaDocs').append(tabla);
+			}
+		});
+	}
+});
+
+var reeimpresion;
+function reimprimirDoc(acc, id){
+	$.ajax({
+		url:'rutas/rutaTrabajador.php',
+		type:'POST',
+		data: {info: id, action: 'traerDoc'},
+		dataType:'JSON',
+		error: function(error){
+			console.log(error);
+				//removeSpinner();
+		},
+		success: function(data){
+			//removeSpinner();
+			$('#modalCapt').modal('hide');
+			$.each(data, function (i, campo){
+				nombreSAVE = campo.nombre;
+				curpSAVE = campo.curp;
+				ocupacionSAVE = campo.ocupacion;
+				puestoSAVE = campo.puesto;
+				empresaSAVE = campo.empresa;
+				shcpSAVE = campo.shcp;
+				cursoSAVE = campo.curso;
+				duracionSAVE = campo.duracion;
+				initSAVE = campo.init;
+				finSAVE = campo.fin;
+				clvcursoSAVE = campo.clvcurso;
+				instructorSAVE = campo.instructor;
+				stpsSAVE = campo.stps;
+				patronSAVE = campo.patron;
+				representanteSAVE = campo.representante;
+				imgEmpSAVE = campo.imgemp;
+				imgCursoSAVE = campo.imgcurso;
+				fechaHora = campo.fechaHora;
+			});
+			if(imgCursoSAVE !== 'sin-foto'){
+				$.getJSON( "json/" + imgCursoSAVE + ".json", function( data ) {
+					$.each(data, function( key, val) {
+						imgCursoTXT = val[0]["codigo"];
+						imgEmpW = val[0]["detalles"].split('-')[0];
+						imgEmpH = val[0]["detalles"].split('-')[1];
+					});
+				});
+			}else{
+				imgCursoTXT = imgCursoSAVE;
+			}
+			if(imgEmpSAVE !== 'sin-foto'){
+				$.getJSON( "json/" + imgEmpSAVE + ".json", function( data ) {
+					$.each(data, function( key, val) {
+						imgEmpTXT = val[0]["codigo"];
+						imgCurW = val[0]["detalles"].split('-')[0];
+						imgCurH = val[0]["detalles"].split('-')[1];
+					});
+				});
+			}else{
+				imgEmpTXT = imgEmpSAVE;
+			}
+			
+			setTimeout(function(){
+				reeimpresion = true;
+				accionPDF = parseInt(acc);
+				valsFormulario();
+			},1000);
+		}
+	});
+}
 // ************************************************
 // :::::::::::: FIN FUNCONES BASES DE DATOS :::::::
 // ************************************************
@@ -746,7 +883,7 @@ function busqTrabajador(trabData, idInput, tipoBusq){
 
 // :::::::::::::::::::::::::::::::::::
 // FUNCIONES CON CATALOGOS
-function leerCatalogos(){
+function leerCatalogos(sel){
 	$.ajax({
 		url:'rutas/rutaCatalogos.php',
 		type:'POST',
@@ -758,22 +895,12 @@ function leerCatalogos(){
 		},
 		success: function(data){
 			//removeSpinner();
-			llenarCatalogoSelect(data);
+			llenarCatalogoSelect(data, sel);
 		}
 	});
 }
 // :::::::::::::::::::::::::::::::::::
 
-
-// ************** FUNCIONES CON EL FOMULARIO *********
-$(document).on('click', '#buscarEmpleadoDoc', function(){
-	modalBusqEmpresaFill();
-});
-
-// BUSCAR EMPRESA
-$(document).on('keyup', '#buscarEmpresaDoc', function(){
-	consultEmpresa($(this).val(), 'tablaEmpresasDoc', 'empresaDoc');
-});
 
 // FUNCION TRAER CURSOS
 var idEmpresaDoc;
@@ -824,22 +951,23 @@ $(document).on('change', '#selectCurso', function(){
 					clvcursoSAVE = campo.area;
 					stpsSAVE = campo.stps;
 					instructorSAVE = campo.instructor;
-					verifIMGCurso = campo.imagen;
+					imgCursoSAVE = campo.imagen;
 				});
 				// LLENADO DE CODIGO BASE64 (SI EXISTE)
-				if(verifIMGCurso !== 'sin-foto'){
-					$.getJSON( "json/" + verifIMGCurso + ".json", function( data ) {
+				if(imgCursoSAVE !== 'sin-foto'){
+					$.getJSON( "json/" + imgCursoSAVE + ".json", function( data ) {
 						$.each(data, function( key, val) {
-							imgCursoSAVE = val[0]["codigo"];
+							imgCursoTXT = val[0]["codigo"];
+							imgCurW = val[0]["detalles"].split('-')[0];
+							imgCurH = val[0]["detalles"].split('-')[1];
 						});
 					}).done(function(){
 						msgMulti('Datos de curso', '<b>Duracion (hrs): </b>' + duracionSAVE + '\n<b>Inicia: </b>' + initSAVE + '\n<b>Concluye: </b>' + finSAVE + '\n<b>Clave de Area: </b>' + clvcursoSAVE+ '\n<b>Capacitador: </b>' + stpsSAVE, 15000, 'info');
 					});
 				}else{
-					imgCursoSAVE = verifIMGCurso;
+					imgCursoTXT = imgCursoSAVE;
 					msgMulti('Datos de curso', '<b>Duracion (hrs): </b>' + duracionSAVE + '\n<b>Inicia: </b>' + initSAVE + '\n<b>Concluye: </b>' + finSAVE + '\n<b>Clave de Area: </b>' + clvcursoSAVE+ '\n<b>Capacitador: </b>' + stpsSAVE, 15000, 'info');
 				}
-				
 			}
 		});
 	}
@@ -890,9 +1018,7 @@ function limpiarTrabajador(){
 
 // *****************************************
 // FUNCION LLENADO DINAMICO DE DATOS
-function llenarCatalogoSelect(json){
-	$('#cursosCat').html('');
-	$('#empleosCat').html('');
+function llenarCatalogoSelect(json, num){
 	var empleoOptions = "<option value='-1'>- Eliga la Ocupacion específica (Catálogo nacional de ocupaciones) -</option>";
 	var cursosOptions = "<option value='-1'>- Área temática del curso -</option>";
 	$.each(json, function (i, catalogo){
@@ -902,8 +1028,19 @@ function llenarCatalogoSelect(json){
 			empleoOptions += "<option value='" + catalogo.clave + "'>" + catalogo.clave + " - " + catalogo.denominacion + "</option>";
 		}
 	});
-	$('#cursosCat').append(cursosOptions);
-	$('#empleosCat').append(empleoOptions);
+	if(num === 1){
+		$('#cursosCat').html('');
+		$('#cursosCat').append(cursosOptions);
+	}else if(num === 2){
+		$('#empleosCat').html('');
+		$('#empleosCat').append(empleoOptions);
+	}
+	else if(num === 3){
+		$('#cursosCat').html('');
+		$('#empleosCat').html('');
+		$('#cursosCat').append(cursosOptions);
+		$('#empleosCat').append(empleoOptions);
+	}
 }
 // FUNCION LLENAR VARIABLES
 
@@ -924,19 +1061,21 @@ function llenarDataEmpresas(id){
 				shcpSAVE = campo.rfc;
 				patronSAVE = campo.jefe;
 				representanteSAVE = campo.representante;
-				verifIMGEmpresa = campo.imagen;
+				imgEmpSAVE = campo.imagen;
 			});
 			// LLENADO DE CODIGO BASE64 (SI EXISTE)
-			if(verifIMGEmpresa !== 'sin-foto'){
-				$.getJSON( "json/" + verifIMGEmpresa + ".json", function( data ) {
+			if(imgEmpSAVE !== 'sin-foto'){
+				$.getJSON( "json/" + imgEmpSAVE + ".json", function( data ) {
 					$.each(data, function( key, val) {
-						imgEmpSAVE = val[0]["codigo"];
+						 imgEmpTXT = val[0]["codigo"];
+						 imgEmpW = val[0]["detalles"].split('-')[0];
+						 imgEmpH = val[0]["detalles"].split('-')[1];
 					});
 				}).done(function(){
 					msgMulti('Datos de empresa', '<b>RFC: </b>' + shcpSAVE + '\n<b>Jefe: </b>' + patronSAVE + '\n<b>Representante: </b>' + representanteSAVE, 15000, 'info');
 				});
 			}else{
-				imgEmpSAVE = verifIMGEmpresa;
+				imgEmpTXT = imgEmpSAVE;
 				msgMulti('Datos de empresa', '<b>RFC: </b>' + shcpSAVE + '\n<b>Jefe: </b>' + patronSAVE + '\n<b>Representante: </b>' + representanteSAVE, 15000, 'info');
 			}
 		}
@@ -947,13 +1086,13 @@ function llenarDataEmpresas(id){
 // VARIABLES FIJAS
 var nombreTXT, curpTXT, ocupacionTXT, puestoTXT, empresaTXT;
 var shcpTXT, cursoTXT, duracionTXT, initTXT, finTXT, clvcursoTXT, instructorTXT;
-var stpsTXT, patronTXT, representanteTXT;
+var stpsTXT, patronTXT, representanteTXT, imgEmpTXT, imgCursoTXT;
 // VARIABLES MANIPULABLES
 var nombreSAVE, curpSAVE, ocupacionSAVE, puestoSAVE, empresaSAVE;
 var shcpSAVE, cursoSAVE, duracionSAVE, initSAVE, finSAVE, clvcursoSAVE, instructorSAVE;
 var stpsSAVE, patronSAVE, representanteSAVE, imgEmpSAVE, imgCursoSAVE;
 // VARIABLES DE VERIFICACION IMAGEN O TEXTO
-var verifIMGEmpresa, verifIMGCurso;
+var imgEmpW, imgEmpH, imgCurW, imgCurH;
 function configValsPDF(){
 	var temIniFecha = initTXT;
 	var temFinFecha = finTXT;
@@ -974,16 +1113,16 @@ function configValsPDF(){
 	}
 
 	// CREACION DE IMAGENES O TEXTO EN DOC
-	if(verifIMGEmpresa === 'sin-foto'){
+	if(imgEmpSAVE === 'sin-foto'){
 		imgTxtEmp = "{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]}";
 	}else{
-		imgTxtEmp = "{image: 'data:image/png;base64," + imgEmpSAVE + "', width: 70, alignment: 'left', border: [false, false, false, false]}";
+		imgTxtEmp = "{image: 'data:image/png;base64," + imgEmpTXT + "', fit: [" + parseInt(imgEmpW) + "," + parseInt(imgEmpW) + "], alignment: 'left', border: [false, false, false, false]}";
 	}
 
-	if(verifIMGCurso === 'sin-foto'){
+	if(imgCursoSAVE === 'sin-foto'){
 		imgTxtCurso = "{text: '\\n\\n\\n\\n\\n',border: [false, false, false, false]}";
 	}else{
-		imgTxtCurso = "{image: 'data:image/png;base64," + imgCursoSAVE + "', width: 70, alignment: 'right', border: [false, false, false, false]}";
+		imgTxtCurso = "{image: 'data:image/png;base64," + imgCursoTXT + "', fit: [" + parseInt(imgCurW) + "," + parseInt(imgCurH) + "], alignment: 'right', border: [false, false, false, false]}";
 	}
 
 	contTXTIMG = "[[" + imgTxtEmp + "," + imgTxtCurso + "]]";
@@ -997,7 +1136,10 @@ function configValsPDF(){
 // ::::::::::::: FUNCION CON EL DOCUMENTO :::::::::::
 // FUNCION QUE LLENA LAS VARS DESDE EL FORMULARIO
 function valsFormulario(){
-	if($('#nomEmpleado').val() === ''){
+	var imprimir = false;
+	if(reeimpresion === true){
+		imprimir = true;
+	}else if($('#nomEmpleado').val() === ''){
 		msgMulti('Error', 'Coloque el nombre del trabajador', 6000,'error');
 		$('#nomEmpleado').focus();
 	}else if($('#curp').val() === ''){
@@ -1018,11 +1160,22 @@ function valsFormulario(){
 		msgMulti('Error', 'Eliga el curso', 6000,'error');
 		$('#selectCurso').focus();
 	}else{
-		disabledBtnDoc();
-		nombreTXT = $('#nomEmpleado').val();
+		imprimir = true;
+	}
 
-		curpTXT = $('#curp').val();
-		curpTXT = curpTXT.toUpperCase().split('');
+	if(imprimir === true){
+		if(reeimpresion === false){
+			nombreSAVE = $('#nomEmpleado').val();
+			curpSAVE = $('#curp').val().toUpperCase();
+			ocupacionSAVE = $('#empleosCat option:selected').text();
+			puestoSAVE = $('#puesto').val();
+		}
+
+		disabledBtnDoc();
+		nombreTXT = nombreSAVE;
+
+		curpTXT = curpSAVE;
+		curpTXT = curpTXT.split('');
 		if(curpTXT.length < 18){
 			var curpNum = 18 - curpTXT.length;
 			for(c = 0; c < curpNum; c++){
@@ -1030,12 +1183,12 @@ function valsFormulario(){
 			}
 		}
 
-		ocupacionTXT = $('#empleosCat option:selected').text();
-		puestoTXT = $('#puesto').val();
+		ocupacionTXT = ocupacionSAVE;
+		puestoTXT = puestoSAVE;
 
 		empresaTXT = empresaSAVE;
 
-		shcpTXT = shcpSAVE.split('');
+		shcpTXT = shcpSAVE.toUpperCase().split('');
 		if(shcpTXT.length < 13){
 			var shcpAux = [''];
 			for(r = 0; r < shcpTXT.length; r++){
@@ -1077,6 +1230,28 @@ function cadenaRandom(lng){
     for( var i=0; i < lng; i++ )
         cadAleatoria += possible.charAt(Math.floor(Math.random() * possible.length));
     return cadAleatoria;
+}
+
+// CREACION DE FECHA - HORA
+var fechaHora;
+function fechaHoraFunc(){
+	var d = new Date();
+	var mes = d.getMonth() + 1;
+	d = d.toString().split(' ');
+	var dia;
+	if(parseInt(mes) < 10){
+		mes = '0' + mes;
+	}
+	fechaHora = d[3] + '-' + mes + '-' + d[2];
+	// FORMATO DE FECHA :: AÑO-MES-DIA
+}
+var fechaHoraFormato;
+function fechaHoraFormatear(fecha){
+	var meses = ["*","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+	var dMes = parseInt(fecha.split("-")[1]);
+	var dDia = parseInt(fecha.split("-")[2]);
+	var dYear = parseInt(fecha.split("-")[0]);
+	fechaHoraFormato = parseInt(dDia) + ' de ' + meses[dMes] + ' del ' + dYear;
 }
 // ::::::::::: FIN FUNCIONES MISCELANEAS :::::::::::::
 var imgTxtEmp;
@@ -1826,6 +2001,9 @@ function crearDocumento(){
 		// ABRIMOS EL DOC
 		pdfMake.createPdf(doc).open();
 		altaTrabajador();
+		if(reeimpresion === false){
+			altaDocCompleto();
+		}
 	}else if(accionPDF === 2){
 		// DESCARGAMOS EL DOC
 
@@ -1836,7 +2014,7 @@ function crearDocumento(){
 		    '<form action="" class="formName">' +
 		    '<div class="form-group">' +
 		    '<label>Escriba el nombre del archivo...</label>' +
-		    '<input type="text" placeholder="Your name" class="name form-control" required />' +
+		    '<input type="text" placeholder="Nombre de PDF..." class="name form-control"/>' +
 		    '</div>' +
 		    '</form>',
 		    buttons: {
@@ -1852,6 +2030,9 @@ function crearDocumento(){
 		                nomDoc = name;
 		                pdfMake.createPdf(doc).download(nomDoc);
 		                altaTrabajador();
+		                if(reeimpresion === false){
+							altaDocCompleto();
+						}
 		            }
 		        },
 		        defecto: {
@@ -1864,6 +2045,9 @@ function crearDocumento(){
 						}
 						pdfMake.createPdf(doc).download(nomDoc);
 						altaTrabajador();
+						if(reeimpresion === false){
+							altaDocCompleto();
+						}
 		            }
 		        },
 		        cancelar: {

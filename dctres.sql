@@ -82,6 +82,32 @@ PRIMARY KEY (`id`),
 	KEY `user` (`user`)
 );
 
+-- ::::::::::: TABLA DE DOCUMENTOS
+DROP TABLE IF EXISTS `docs`;
+CREATE TABLE IF NOT EXISTS `docs` (
+	`id` bigint(20) NOT NULL AUTO_INCREMENT,
+	`nombre` varchar(400) COLLATE utf8_bin DEFAULT NULL,
+	`curp` varchar(300) COLLATE utf8_bin DEFAULT NULL,
+	`ocupacion` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`puesto` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`empresa` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`shcp` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`curso` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`duracion` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`init` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`fin` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`clvcurso` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`instructor` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`stps` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`patron` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`representante` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`imgemp` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`imgcurso` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+	`fecha` varchar(500) COLLATE utf8_bin DEFAULT NULL,
+PRIMARY KEY (`id`),
+	KEY `curp` (`curp`)
+);
+
 INSERT INTO login (user, pass, tipo) VALUES ('admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrador');
 
 -- ::::::::::: INSERCION DE VALORES TABLAS EMPLEO Y CURSOS

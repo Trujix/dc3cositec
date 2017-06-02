@@ -263,6 +263,56 @@
 	END $$
 	DELIMITER ;
 
+	-- :::::::::: ALTA DE DOC :::::::
+	DROP PROCEDURE IF EXISTS SP_ALTADOCUMENTO;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_ALTADOCUMENTO(
+		IN _nombre VARCHAR(500), IN _curp VARCHAR(200),
+		IN _ocupacion VARCHAR(500), IN _puesto VARCHAR(500),
+		IN _empresa VARCHAR(500), IN _shcp VARCHAR(500),
+		IN _curso VARCHAR(500), IN _duracion VARCHAR(200),
+		IN _init VARCHAR(500), IN _fin VARCHAR(500),
+		IN _clvcurso VARCHAR(500), IN _instructor VARCHAR(500),
+		IN _stps VARCHAR(500), IN _patron VARCHAR(500),
+		IN _representante VARCHAR(500), IN _imgemp VARCHAR(500),
+		IN _imgcurso VARCHAR(500), IN _fecha VARCHAR(500)
+	)
+	BEGIN
+		INSERT INTO docs (nombre, curp, ocupacion, puesto, empresa, shcp, curso, duracion, init, fin, clvcurso, instructor, stps, patron, representante, imgemp, imgcurso, fecha)
+			VALUES (_nombre, _curp, _ocupacion, _puesto, _empresa, _shcp, _curso, _duracion, _init, _fin, _clvcurso, _instructor, _stps, _patron, _representante, _imgemp, _imgcurso, _fecha);
+	END $$
+	DELIMITER ;
+
+	-- :::::::::: BUSCAR DOCUMENTOS :::::::
+	DROP PROCEDURE IF EXISTS SP_BUSCARDOCS;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_BUSCARDOCS(
+		IN _nombre VARCHAR(500)
+	)
+	BEGIN
+		SELECT id, nombre, empresa, curso, fecha
+			FROM docs
+				WHERE UPPER(nombre) LIKE UPPER(CONCAT(_nombre, '%'));
+	END $$
+	DELIMITER ;
+
+	-- :::::::::: TRAER DOCUMENTO :::::::
+	DROP PROCEDURE IF EXISTS SP_TRAEDOC;
+
+	DELIMITER $$
+
+	CREATE PROCEDURE SP_TRAEDOC(
+		IN _id INT
+	)
+	BEGIN
+		SELECT * FROM docs WHERE id = _id;
+	END $$
+	DELIMITER ;
+
 	-- :::::::::: BUSCAR TRABAJADOR :::::::
 	DROP PROCEDURE IF EXISTS SP_BUSCARTRABAJADOR;
 

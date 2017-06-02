@@ -1,8 +1,7 @@
 // ::::::::::: * * * * * * * * * * * :::::::::::::::::
 // FUNCIONES ESPECIALES CON EL DOM
 $(function(){
-	// TRAER LOS CATALOGOS
-	leerCatalogos();
+	// TRAER LOS CATALOGOS leerCatalogos(2);
 	var param1 = leerCookie('alterego');
 	var param2 = leerCookie('key');
 	if(param1 !== undefined && param2 !== undefined){
@@ -160,7 +159,7 @@ function imageLoaded2(){
 // :::::::::: LLENADO DEL MODAL :::::::::::::
 function loginHTMLFill(){
 	var cont = '<div class="form-signin">'+
-        '<h2 class="form-signin-heading">Iniciar Sesion</h2>'+
+        '<h3 class="form-signin-heading" align="center"><span class="glyphicon glyphicon-save-file"></span>&nbsp;&nbsp;Sistema DC-3</h3>'+
         '<label for="inputEmail" class="sr-only">Usuario</label>'+
         '<input type="text" id="user" class="form-control" placeholder="Uusario" required autofocus>'+
         '<label for="inputPassword" class="sr-only">Contraseña</label>'+
@@ -176,9 +175,27 @@ function loginHTMLFill(){
 	setTimeout(function(){
 		$('#cuerpo').show(200);
 		$('#barraPrinc').show(200);
-		leerCatalogos();
+		leerCatalogos(2);
 	}, 800);
 }
+
+// HACER LOGIN AL HACER CLICK SOBRE LOS TEXTOS
+$(document).on('keyup', '#user', function(e){
+	if(e.keyCode === 13){
+		login($(this).val(), $("#pass").val(), 'loginForm');
+	}
+});
+
+$(document).on('keyup', '#pass', function(e){
+	if(e.keyCode === 13){
+		login($("#user").val(), $(this).val(),'loginForm');
+	}
+});
+
+$(document).on('click', '#loginBTN', function(){
+	login($("#user").val(), $("#pass").val(), 'loginForm');
+});
+
 
 function cuerpoHTMLFill(){
 	var barra = '<div class="container">'+
@@ -193,8 +210,12 @@ function cuerpoHTMLFill(){
         '</div>'+
         '<div id="navbar" class="navbar-collapse collapse">'+
           '<ul class="nav navbar-nav">'+
-            '<li><a id="altaEmpresas" role="button">Empresas</a></li>'+
-            '<li><a id="altaCursos" role="button">Cursos</a></li>'+
+            '<li><a id="altaEmpresas" role="button"><span class="glyphicon glyphicon-home"></span>&nbsp;&nbsp;Empresas</a></li>'+
+            '<li><a id="altaCursos" role="button"><span class="glyphicon glyphicon-apple"></span>&nbsp;&nbsp;Cursos</a></li>'+
+            '<li><a id="reimprimir" role="button"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;Documentos</a></li>'+
+          '</ul>'+
+          '<ul class="nav navbar-nav navbar-right">'+
+	            '<li><a id="logoff" role="button"><span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;Cerrar Sesión</a></li>'+
           '</ul>'+
         '</div>'+
       '</div>';
@@ -203,18 +224,18 @@ function cuerpoHTMLFill(){
 			'<div class="panel-body">'+
 				'<div class="row">'+
 					'<div class="col-md-7">'+
-						'<input id="nomEmpleado" type="text" class="form-control" placeholder="Nombre (Anotar apellido paterno, apellido materno y nombre (s))" />'+
+						'<input id="nomEmpleado" type="text" class="form-control" placeholder="Nombre (Anotar apellido paterno, apellido materno y nombre (s))" /><p></p>'+
 					'</div>'+
 					'<div class="col-md-5">'+
-						'<input id="curp" style="text-transform: uppercase" type="text" class="form-control" Placeholder="CURP (Clave Unica de Registro de Poblacion)" maxlength="18" />'+
+						'<input id="curp" style="text-transform: uppercase" type="text" class="form-control" Placeholder="CURP (Clave Unica de Registro de Poblacion)" maxlength="18" /><p></p>'+
 					'</div>'+
 				'</div><br>'+
 				'<div class="row">'+
 					'<div class="col-md-7">'+
-						'<select id="empleosCat" class="form-control"></select>'+
+						'<select id="empleosCat" class="form-control"></select><p></p>'+
 					'</div>'+
 					'<div class="col-md-5">'+
-						'<input id="puesto" type="text" class="form-control" Placeholder="Puesto" />'+
+						'<input id="puesto" type="text" class="form-control" Placeholder="Puesto" /><p></p>'+
 					'</div>'+
 				'</div>'+
 			'</div>'+
@@ -224,12 +245,12 @@ function cuerpoHTMLFill(){
 			'<div class="panel-body">'+
 				'<div class="row">'+
 					'<div class="col-md-6">'+
-						'<input id="selectEmpresa" type="text" class="form-control" placeholder="Nombre de la empresa" />'+
+						'<input id="selectEmpresa" type="text" class="form-control" placeholder="Nombre de la empresa" /><p></p>'+
 					'</div>'+
 					'<div class="col-md-6">'+
 						'<select id="selectCurso" class="form-control">'+
 							'<option value="-1">- Seleccione el curso -</option>'+
-						'</select>'+
+						'</select><p></p>'+
 					'</div>'+
 				'</div>'+
 			'</div>'+
@@ -240,16 +261,16 @@ function cuerpoHTMLFill(){
 					'<div class="col-md-4">'+
 						'<button id="visualizarPDF" value="1" class="btn btn-info">'+
 							'<span class="glyphicon glyphicon-print"></span> Visualizar Documento'+
-						'</button>'+
+						'</button><p></p>'+
 					'</div>'+
 					'<div class="col-md-4">'+
 						'<button id="descargarPDF" value="2" class="btn btn-primary">'+
 							'<span class="glyphicon glyphicon-save"></span> Descargar Documento'+
-						'</button>'+
+						'</button><p></p>'+
 					'</div>'+
 					'<div class="col-md-4">'+
 						'<button id="limpiarTrabajador" value="2" class="btn btn-default">'+
-							'<span class="glyphicon glyphicon-erase"></span>  Limpiar datos de trabajador y cancelar edicion'+
+							'<span class="glyphicon glyphicon-erase"></span>  Limpiar trabajador y cancelar edicion'+
 						'</button>'+
 					'</div>'+
 				'</div>	'+	
@@ -267,7 +288,7 @@ function cuerpoHTMLFill(){
 	setTimeout(function(){
 		$('#cuerpo').show(200);
 		$('#barraPrinc').show(200);
-		leerCatalogos();
+		leerCatalogos(2);
 	}, 800);
 }
 
@@ -279,25 +300,25 @@ function modalEmpresasFill(){
 
 						'<div class="row">'+
 							'<div class="col-md-12">'+
-								'<input id="empresa" type="text" class="form-control" placeholder="Nombre o razón social (En caso de persona física, anotar apellido paterno, apellido materno y nombre(s))" />'+
+								'<input id="empresa" type="text" class="form-control" placeholder="Nombre o razón social (En caso de persona física, anotar apellido paterno, apellido materno y nombre(s))" /><p></p>'+
 							'</div>'+
 						'</div><br>'+
 
 						'<div class="row">'+
 							'<div class="col-md-4">'+
-								'<input id="rfc" type="text" style="text-transform: uppercase" class="form-control" Placeholder="RFC de la empresa" maxlength="13" />'+
+								'<input id="rfc" type="text" style="text-transform: uppercase" class="form-control" Placeholder="RFC de la empresa" maxlength="13" /><p></p>'+
 							'</div>'+
 							'<div class="col-md-4">'+
-								'<input id="patron" type="text" class="form-control" Placeholder="Patrón o representante Legal" />'+
+								'<input id="patron" type="text" class="form-control" Placeholder="Patrón o representante Legal" /><p></p>'+
 							'</div>'+
 							'<div class="col-md-4">'+
-								'<input id="representante" type="text" class="form-control" Placeholder="Representante de trabajadores" />'+
+								'<input id="representante" type="text" class="form-control" Placeholder="Representante de trabajadores" /><p></p>'+
 							'</div>'+
 						'</div><br>'+
 
 						'<div class="row">'+
 							'<div class="col-md-6">'+
-								'<input name="empresa" type="file" id="imgfile" /><br>'+
+								'<input name="empresa" type="file" id="imgfile" accept=".jpg,.jpeg,.png" /><br>'+
 							'</div>'+
 							'<div class="col-md-6">'+
 								'<canvas id="canvas" class="img-thumbnail"></canvas>'+
@@ -308,16 +329,16 @@ function modalEmpresasFill(){
 				'</div>'+
 
 				'<div class="row">'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-1">'+
 						'<p></p>'+
 					'</div>'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-5">'+
 						'<button id="altaEmpresa" class="btn btn-success">Guardar</button>'+
 					'</div>'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-5">'+
 						'<button name="cerrModal" class="btn btn-danger">Cancelar</button>'+
 					'</div>'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-1">'+
 						'<p></p>'+
 					'</div>'+
 				'</div>';
@@ -342,19 +363,19 @@ function modalCursosFill(){
 
 						'<div class="row">'+
 							'<div class="col-md-8">'+
-								'<input id="nomCurso" type="text" class="form-control" placeholder="Nombre del curso" />'+
+								'<input id="nomCurso" type="text" class="form-control" placeholder="Nombre del curso" /><p></p>'+
 							'</div>'+
 							'<div class="col-md-4">'+
-								'<input id="duracion" type="text" class="form-control" placeholder="Duración en horas" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" />'+
+								'<input id="duracion" type="text" class="form-control" placeholder="Duración en horas" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" /><p></p>'+
 							'</div>'+
 						'</div><br>'+
 
 						'<div class="row">'+
 							'<div class="col-md-3">'+
-								'<label>PERIODO EJECUCIÓN DE: </label>'+
+								'<label>PERIODO EJECUCIÓN DE: </label><p></p>'+
 							'</div>'+
 							'<div class="col-md-4">'+
-								'<input id="fechaIni" type="date" class="form-control" />'+
+								'<input id="fechaIni" type="date" class="form-control" /><p></p>'+
 							'</div>'+
 							'<div class="col-md-1">'+
 								'<label>- A -</label>'+
@@ -365,19 +386,19 @@ function modalCursosFill(){
 						'</div><br>'+
 						'<div class="row">'+
 							'<div class="col-md-4">'+
-								'<select id="cursosCat" class="form-control"></select>'+
+								'<select id="cursosCat" class="form-control"></select><p></p>'+
 							'</div>'+
 							'<div class="col-md-3">'+
-								'<input id="instructor" type="text" class="form-control" Placeholder="Instructor o tutor..." />'+
+								'<input id="instructor" type="text" class="form-control" Placeholder="Instructor o tutor..." /><p></p>'+
 							'</div>'+
 							'<div class="col-md-5">'+
-								'<input id="capacitador" type="text" class="form-control" Placeholder="Nombre del agente capacitador o STPS" />'+
+								'<input id="capacitador" type="text" class="form-control" Placeholder="Nombre del agente capacitador o STPS" /><p></p>'+
 							'</div>'+
 						'</div><br>'+
 
 						'<div class="row">'+
 							'<div class="col-md-6">'+
-								'<input type="file" id="imgfile2" /><br>'+
+								'<input type="file" id="imgfile2" accept=".jpg,.jpeg,.png" /><br>'+
 							'</div>'+
 							'<div class="col-md-6">'+
 								'<canvas id="canvas2" class="img-thumbnail"></canvas>'+
@@ -393,16 +414,16 @@ function modalCursosFill(){
 					'</div>'+
 				'</div>'+
 				'<div class="row">'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-1">'+
 						'<p></p>'+
 					'</div>'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-5">'+
 						'<button id="altaCurso" class="btn btn-success">Guardar</button>'+
 					'</div>'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-5">'+
 						'<button name="cerrModal" class="btn btn-danger">Cancelar</button>'+
 					'</div>'+
-					'<div class="col-md-3">'+
+					'<div class="col-md-3 col-xs-1">'+
 						'<p></p>'+
 					'</div>'+
 				'</div>';
@@ -411,42 +432,36 @@ function modalCursosFill(){
 
 	$('#modalCapt').modal('show');
 	$('#titModal').text('Alta de Cursos');
-	leerCatalogos();
+	leerCatalogos(1);
 	limpiarModalCursos();
 }
 
-function modalBusqEmpresaFill(){
+function modalDocsBusquedaFill(){
 	var cont = '<div class="panel panel-default"><div class="panel-body">'+
 				'<div class="row">'+
 	    			'<div class="col-md-12">'+
-	    				'<input id="buscarEmpresaDoc" type="text" class="form-control" placeholder="Escriba el nombre de la empresa" />'+
+	    				'<input id="buscarTrabajador" type="text" class="form-control" placeholder="Escriba el nombre del trabajador..." />'+
 	    			'</div>'+
 	    		'</div><br>'+
 	    		'<div class="row">'+
 	    			'<div class="col-md-12">'+
 	    				'<br>'+
-	    				'<div class="tablaConsulta2">'+
-	    					'<div id="tablaEmpresasDoc" class="table-responsive"></div>'+
+	    				'<div class="trabajadoresDoc">'+
+	    					'<div id="tablaDocs" class="table-responsive"></div>'+
 	    				'</div>'+
 	    			'</div>'+
 	    		'</div>'+
 	    		'</div></div>';
 	$('#modalCuerpo').html('');
 	$('#modalCuerpo').append(cont);
-	$('#tablaEmpresasDoc').html('');
-	$('#buscarEmpresaDoc').val('');
-	$('#titModal').text('Buscar Empresa');
+	$('#tablaDocs').html('');
+	$('#buscarTrabajador').val('');
+	$('#titModal').text('Reimprimir documento');
 	$('#modalCapt').modal('show');
 	setTimeout(function(){
-		$('#buscarEmpresaDoc').focus();
+		$('#buscarTrabajador').focus();
 	}, 500);
 }
-
-$(document).on('click', '#loginBTN', function(){
-	var us = $("#user").val();
-	var pas = $("#pass").val();
-	login(us, pas, 'loginForm');
-});
 
 // FUNCIONES DE SEGURIDAD
 function login(user, clave, origen){
@@ -486,6 +501,14 @@ function login(user, clave, origen){
 		}
 	});
 }
+
+// LOGOFF
+$(document).on('click', '#logoff', function(){
+	document.cookie = "alterego=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+	document.cookie = "key=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+	location.reload();
+});
+
 function leerCookie(nombre){
   var value = "; " + document.cookie;
   var parts = value.split("; " + nombre + "=");
