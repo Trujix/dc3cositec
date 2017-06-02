@@ -4,24 +4,32 @@ var empresaNuevo = true;
 var cursoNuevo = true;
 
 var accionPDF = 0;
-var idButtonDoc;
 $(document).on("click", "#visualizarPDF" ,function(){
-	$(this).addClass('disabled');
-	idButtonDoc = 'visualizarPDF';
 	accionPDF = parseInt($(this).val());
 	valsFormulario();
 });
 
 $(document).on("click", "#descargarPDF", function(){
-	$(this).addClass('disabled');
-	idButtonDoc = "descargarPDF";
 	accionPDF = parseInt($(this).val());
 	valsFormulario();
 });
 
 $(document).on('click', '#limpiarTrabajador', function(){
 	limpiarTrabajador();
-})
+});
+// FUNCION AUXILIAR DESHABILITAR BOTONES (ANTES DE QUE IMPRIMA)
+function disabledBtnDoc(){
+	$('#visualizarPDF').addClass('disabled');
+	$('#descargarPDF').addClass('disabled');
+	$('#limpiarTrabajador').addClass('disabled');
+}
+// FUNCIO AUXILIAR HABILITAR BOTONES (DESPUES DE QUE IMPRIMA)
+function habilBtnDoc(){
+	$('#visualizarPDF').removeClass('disabled');
+	$('#descargarPDF').removeClass('disabled');
+	$('#limpiarTrabajador').removeClass('disabled');
+}
+
 
 // ABRIR MODAL (CURSOS)
 $(document).on('click', '#altaCursos', function(){
@@ -112,7 +120,7 @@ $(document).on('keyup', '#selectEmpresa', function(e){
 });
 
 // CONSULTA EMPRESA (ALTA CURSO)
-$(document).on('keyup', '#nomEmpresa', function(){
+$(document).on('keyup', '#nomEmpresa', function(e){
 	consultEmpresa($(this).val(), 'nomEmpresa', 'modal', 'curso');
 	if(e.keyCode === 8){
 		idEmpresaCurso = '';
@@ -150,7 +158,7 @@ $(document).on('click', '#altaCurso', function(){
 	}else if($('#capacitador').val() === ''){
 		$('#capacitador').focus();
 	}else{
-		if(accionCurso === 'editarCurso' && fotoPDF2 === 'sin-foto'){
+		if(accionCurso === 'editarCurso' && $('#imgfile2').val() === ''){
 			$.confirm({
 			    title: 'No seleccionó imagen',
 			    content: 'Si previamente eligió una imagen para este curso, esta se eliminará\n¿Decea continuar?',
@@ -391,12 +399,9 @@ function selecEmpresaCurso(id){
 }
 // FUNCION ALTA DE CURSOS
 function altaEditCursos(){
-	var imgNombre;
-	if($('#imgfile').val() !== ''){
+	if(accionCurso === 'altaCursos' && $('#imgfile2').val() !== ''){
 		cadenaRandom(8);
-		imgNombre = cadAleatoria;
-	}else{
-		imgNombre = 'sin-foto';
+		fotoPDF2 = cadAleatoria;
 	}
 	var jsonCursos = {
 		id: idCurso,
@@ -409,7 +414,7 @@ function altaEditCursos(){
 		area: $('#cursosCat option:selected').text(),
 		instructor: $('#instructor').val(),
 		stps: $('#capacitador').val(),
-		imagen: imgNombre
+		imagen: fotoPDF2
 	};
 
 	$.confirm({
@@ -432,7 +437,7 @@ function altaEditCursos(){
 						success: function(data){
 							//removeSpinner();
 
-							if(imgNombre !== 'sin-foto'){
+							if(fotoPDF2 !== 'sin-foto' || fotoPDF2 !== 'noeditar'){
 								var imgEmpresa = document.getElementById("imgfile2").files[0];
 								var data = new FormData();
 								data.append('archivo', imgEmpresa);
@@ -590,12 +595,15 @@ function consultCurso(nombre, idInput){
 			},
 			success: function(data){
 				$.each(data, function (i, campo){
-					cursos.push(campo.curso);
+					cursos.push({label: campo.curso, value: campo.curso, cur: campo.id});
 				});
 				$('#'+idInput).autocomplete({
-					source: cursos,
+					source: function(request, response) {
+			            response(cursos);
+			        },
 					select: function(event, ui){
-						console.log(ui);
+						var idCurs = ui.item.cur;
+						editarCurso(idCurs);
 					}
 				});
 				$("#"+idInput).autocomplete( "option", "appendTo", "#modalCapt" );	
@@ -678,7 +686,6 @@ $(document).on('change', '#selectCurso', function(){
 			},
 			success: function(data){
 				//removeSpinner();
-				console.log(data);
 				$.each(data, function (i, campo){
 					cursoSAVE = campo.curso;
 					duracionSAVE = campo.duracion;
@@ -850,7 +857,7 @@ function configValsPDF(){
 
 	setTimeout(function(){
 		crearDocumento();
-		$('#'+idButtonDoc).removeClass('disabled');
+		habilBtnDoc();
 	}, 1500);
 }
 
@@ -878,6 +885,7 @@ function valsFormulario(){
 		msgMulti('Error', 'Eliga el curso', 6000,'error');
 		$('#selectCurso').focus();
 	}else{
+		disabledBtnDoc();
 		nombreTXT = $('#nomEmpleado').val();
 
 		curpTXT = $('#curp').val();
