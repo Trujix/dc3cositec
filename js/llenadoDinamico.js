@@ -161,7 +161,7 @@ function loginHTMLFill(){
 	var cont = '<div class="form-signin">'+
         '<h3 class="form-signin-heading" align="center"><span class="glyphicon glyphicon-save-file"></span>&nbsp;&nbsp;Sistema DC-3</h3>'+
         '<label for="inputEmail" class="sr-only">Usuario</label>'+
-        '<input type="text" id="user" class="form-control" placeholder="Uusario" required autofocus>'+
+        '<input type="text" id="user" class="form-control" placeholder="Usuario" required autofocus>'+
         '<label for="inputPassword" class="sr-only">Contraseña</label>'+
         '<input type="password" id="pass" class="form-control" placeholder="Contraseña" required>'+
         '<div class="checkbox">'+
